@@ -8,9 +8,9 @@ Vogliamo fare neural style transfer (NST). In particolare:
 
 -------------------------------------
 
-# Advanced Neural Style Transfer Techniques (PyTorch)
 
-Multi-Style Transfer (Multiple Styles in One Image)
+
+# Multi-Style Transfer (Multiple Styles in One Image)
 
 Neural style transfer typically applies a single artistic style to a content image, but multi-style transfer aims to blend or switch between several styles within one output. Key PyTorch resources include:
 
