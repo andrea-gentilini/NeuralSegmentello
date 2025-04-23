@@ -8,6 +8,27 @@ Vogliamo fare neural style transfer (NST). In particolare:
 
 -------------------------------------
 
+LINK trovati il 23 Aprile durante lezione AI lab:
+
+https://github.com/SamsungLabs/ritm_interactive_segmentation
+
+https://github.com/facebookresearch/segment-anything?tab=readme-ov-file
+
+
+-----------------------------------------
+
+Dataset che abbiamo scelto di usare: 
+
+https://cocodataset.org/#download
+
+anno 2014 (train, val, test)
+
+
+
+
+
+---------------------------------------
+
 
 
 # Multi-Style Transfer (Multiple Styles in One Image)
