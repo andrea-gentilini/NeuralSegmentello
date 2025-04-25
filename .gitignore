@@ -3,3 +3,7 @@ COCO_2014_dataset/
 .DS_Store
 __pycache__
 scratches
+**/venv/
+**/full_dset/
+**/masks/
+**/coarse_masks/
