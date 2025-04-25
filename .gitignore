@@ -1,3 +1,5 @@
 pytorch-AdaIN/
 COCO_2014_dataset/
 .DS_Store
+__pycache__
+scratches
