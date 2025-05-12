@@ -1,15 +1,10 @@
-from .data.config import *
+from data.config import *
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-
-
-# TODO dataset, dataloader, ...
-class CocoDataset(Dataset):
-  ...
 
 
 class DoubleConv(nn.Module):
@@ -36,7 +31,7 @@ class UNet(nn.Module):
   """
   U-Net architecture for image segmentation.
   """
-  def __init__(self, in_channels=4, out_channels=2):
+  def __init__(self, in_channels=2, out_channels=1):
     super(UNet, self).__init__()
 
     # Encoder
@@ -125,36 +120,68 @@ class UNetLightning(pl.LightningModule):
   def __init__(self):
     super(UNetLightning, self).__init__()
     self.save_hyperparameters()
-    self.model = UNet(in_channels=4, out_channels=2)
-    self.loss_fn = nn.CrossEntropyLoss()
+    self.model = UNet()
+    # self.loss_fn = nn.CrossEntropyLoss()
+    self.loss_fn = nn.BCEWithLogitsLoss()
 
   def forward(self, x):
     return self.model(x)
 
+  # def training_step(self, batch, batch_idx):
+  #   images, masks = batch
+  #   preds = self(images)
+  #   loss = self.loss_fn(preds, masks.squeeze(1))
+  #   self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True)
+  #   return loss
+
+  # def validation_step(self, batch, batch_idx):
+  #   images, masks = batch
+  #   preds = self(images)
+  #   loss = self.loss_fn(preds, masks.squeeze(1))
+
+  #   # Compute IoU
+  #   preds_class = torch.argmax(preds, dim=1)  # (N, H, W)
+  #   ious = []
+  #   for i in range(images.size(0)):
+  #     iou = compute_iou(preds_class[i], masks[i].squeeze(0))
+  #     ious.append(iou)
+  #   batch_iou = torch.mean(torch.stack(ious))
+
+  #   # Log metrics
+  #   self.log('val_loss', loss, on_epoch=True, prog_bar=True)
+  #   self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
+  #   return loss
+
   def training_step(self, batch, batch_idx):
     images, masks = batch
     preds = self(images)
-    loss = self.loss_fn(preds, masks.squeeze(1))
+    targets = masks.squeeze(1).float()   # shape (N, H, W)
+    preds = preds.squeeze(1)             # shape (N, H, W)
+    loss = self.loss_fn(preds, targets)
     self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True)
     return loss
 
   def validation_step(self, batch, batch_idx):
-    images, masks = batch
-    preds = self(images)
-    loss = self.loss_fn(preds, masks.squeeze(1))
+      images, masks = batch
+      preds = self(images)
+      targets = masks.squeeze(1).float()
+      preds = preds.squeeze(1)
 
-    # Compute IoU
-    preds_class = torch.argmax(preds, dim=1)  # (N, H, W)
-    ious = []
-    for i in range(images.size(0)):
-      iou = compute_iou(preds_class[i], masks[i].squeeze(0))
-      ious.append(iou)
-    batch_iou = torch.mean(torch.stack(ious))
+      loss = self.loss_fn(preds, targets)
 
-    # Log metrics
-    self.log('val_loss', loss, on_epoch=True, prog_bar=True)
-    self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
-    return loss
+      # Compute IoU
+      preds_class = (torch.sigmoid(preds) > 0.5).float()  # binarize logits after sigmoid
+      ious = []
+      for i in range(images.size(0)):
+          iou = compute_iou(preds_class[i], targets[i])
+          ious.append(iou)
+      batch_iou = torch.mean(torch.stack(ious))
+
+      self.log('val_loss', loss, on_epoch=True, prog_bar=True)
+      self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
+      return loss
+
+
 
   def test_step(self, batch, batch_idx):
     images, masks = batch

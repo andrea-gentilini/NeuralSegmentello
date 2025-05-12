@@ -48,8 +48,6 @@ def plot_result(
 
 
 
-
-
 def main() -> None:
 
     dataset_gray = CoarseMaskDataset(DATA_ADAPTATION_DIR, transform_type="v2")

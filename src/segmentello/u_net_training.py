@@ -1,10 +1,11 @@
 from data.config import *
 from dataset import CoarseMaskDataset
 from u_net_attention_model import Coarse2FineUNet
-
+from u_net_model import UNetLightning
 from torch.utils.data import DataLoader
 import torch
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
 
 
@@ -14,23 +15,37 @@ def main() -> None:
     dataset_gray = CoarseMaskDataset(DATA_ADAPTATION_DIR, transform_type="v2")
     gray_dl = DataLoader(dataset_gray, batch_size=1, shuffle=True)  # batch_size=1 per immagini variabili
 
-    # print(f"{dataset_gray[0][0].shape = }")
-    # tmp_img = dataset_gray[0][0][0]
-    # tmp_mask = dataset_gray[0][0][1]
-    # tmp_ground_truth = dataset_gray[0][1][0]
-    # plt.imshow(np.hstack([tmp_img, tmp_mask, tmp_ground_truth]))
-    # plt.axis("off")
-    # plt.show()
-
-    # raise NotImplementedError
-
-    model = Coarse2FineUNet()
-    trainer = pl.Trainer(
-        max_epochs=10, 
-        accelerator="gpu" if torch.cuda.is_available() else "cpu",
-        log_every_n_steps=1
+    checkpoint_callback = ModelCheckpoint(
+        dirpath=MODEL_CHECKPOINT_DIR,
+        filename="best-checkpoint",
+        save_top_k=SAVE_TOP_K,
+        verbose=True,
+        monitor=MONITOR_METRIC,
+        mode="min"
     )
-    trainer.fit(model, gray_dl)
+
+    early_stop_callback = EarlyStopping(
+        monitor=MONITOR_METRIC,
+        patience=10,
+        verbose=True,
+        mode="min"
+    )
+
+    trainer = pl.Trainer(
+        max_epochs=EPOCHS,
+        callbacks=[checkpoint_callback, early_stop_callback],
+        accelerator="auto",
+        log_every_n_steps=5
+    )
+
+    # model = Coarse2FineUNet()
+    model = UNetLightning()
+    # trainer = pl.Trainer(
+    #     max_epochs=10, 
+    #     accelerator="gpu" if torch.cuda.is_available() else "cpu",
+    #     log_every_n_steps=1
+    # )
+    trainer.fit(model, gray_dl, gray_dl)
 
 
 if __name__ == "__main__":
