@@ -11,4 +11,6 @@ SAVE_TOP_K: int = 1
 MONITOR_METRIC: str = "val_loss"
 MODEL_CHECKPOINT_DIR: str = "checkpoints/"
 
-# TODO add train, valid folders and other constants here
+
+
+DATA_ADAPTATION_DIR = './COCO_dset_adaptation/reduced_dset'

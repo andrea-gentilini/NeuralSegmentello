@@ -8,3 +8,4 @@ scratches
 **/masks/
 **/coarse_masks/
 lightning_logs
+.vscode
