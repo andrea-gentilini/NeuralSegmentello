@@ -107,14 +107,42 @@ class DiceLoss(nn.Module):
         return 1 - dice
 
 
+def compute_iou(
+    pred_mask: torch.Tensor, 
+    true_mask: torch.Tensor
+) -> torch.Tensor:
+    """
+    Intersection over Union for a binary segmentation mask.
+
+    Returns a torch.Tensor with only one iou float number
+    """
+    # Ensure binary
+    pred_mask = (pred_mask > 0).float()
+    true_mask = (true_mask > 0).float()
+
+    intersection = (pred_mask * true_mask).sum()
+    union = pred_mask.sum() + true_mask.sum() - intersection
+    iou = intersection / union if union > 0 else torch.tensor(1.0) if intersection == 0 else torch.tensor(0.0)
+    return iou
+
+
 class Coarse2FineUNet(pl.LightningModule):
-    def __init__(self, lr=1e-3):
+    def __init__(self):
         super().__init__()
         self.model = UNet(in_channels=2, out_channels=1)
         # self.loss_fn = nn.BCEWithLogitsLoss()
         self.bce = nn.BCEWithLogitsLoss()
         self.dice = DiceLoss()
-        self.lr = lr
+
+    def compute_loss(self, preds, targets):
+        """
+        helper function to compute same loss in the training and in the 
+        validation step
+        """
+        bce_loss = self.bce(preds, targets)
+        dice_loss = self.dice(preds, targets)
+        return 0.5 * bce_loss + 0.5 * dice_loss
+
 
     def forward(self, x):
         return self.model(x)
@@ -127,13 +155,49 @@ class Coarse2FineUNet(pl.LightningModule):
             x = x.unsqueeze(0).to(self.device)
             y = y.unsqueeze(0).to(self.device)
             logits = self(x)
-            bce_loss = self.bce(logits, y)
-            dice_loss = self.dice(logits, y)
-            loss = 0.5 * bce_loss + 0.5 * dice_loss
+            loss = self.compute_loss(logits, x)
             losses.append(loss)
         total_loss = torch.stack(losses).mean()
         self.log("train_loss", total_loss, prog_bar=True)
         return total_loss
 
+
+    def validation_step(self, batch, batch_idx):
+        images, masks = batch
+        preds = self(images)
+        targets = masks.squeeze(1).float()
+        preds = preds.squeeze(1)
+
+        loss = self.compute_loss(preds, targets)
+
+        # Compute IoU
+        preds_class = (torch.sigmoid(preds) > 0.5).float()  # binarize logits after sigmoid
+        ious = []
+        for i in range(images.size(0)):
+            iou = compute_iou(preds_class[i], targets[i])
+            ious.append(iou)
+        batch_iou = torch.mean(torch.stack(ious))
+
+        self.log('val_loss', loss, on_epoch=True, prog_bar=True)
+        self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
+        return loss
+
+
+    def test_step(self, batch, batch_idx):
+        images, masks = batch
+        preds = self(images)
+        preds_class = torch.argmax(preds, dim=1)
+
+        ious = []
+        for i in range(images.size(0)):
+            iou = compute_iou(preds_class[i], masks[i].squeeze(0))
+            ious.append(iou)
+
+        batch_iou = torch.mean(torch.stack(ious))
+        self.log('test_iou', batch_iou, on_step=False, on_epoch=True, prog_bar=True)
+        return batch_iou
+
+
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.Adam(self.parameters(), lr=LR)
+        return optimizer
