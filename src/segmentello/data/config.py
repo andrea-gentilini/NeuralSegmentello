@@ -9,6 +9,10 @@ SEED: int = 42
 TRAIN_VALID_SPLIT: float = 0.9
 STARTING_LOSS_WEIGHTS = [0.3, 0.2, 0.2, 0.3]
 ORDER_LOSS_WEIGHTS = ["bce", "dice", "boundary", "refine"]
+TRANSFORM_MODE = 'erode'
+IMG_MODE = "gray"
+IMG_GRADIENT = True
+IN_CHANNELS = 1 + int(IMG_GRADIENT) + (3 if IMG_MODE == "RGB" else 1)
 
 # lightning callbacks
 SAVE_TOP_K: int = 1
