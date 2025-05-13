@@ -53,7 +53,7 @@ def random_coarse(mask):
     return coarse_mask.astype(np.uint8)
 
 
-def random_coarse_v2(mask):
+def random_coarse_paintbrush(mask):
     mask = np.ascontiguousarray((mask > 0).astype(np.uint8) * 255)
 
     band_width   = random.randint(15, 40)                      
@@ -84,7 +84,7 @@ def random_coarse_v2(mask):
     return coarse.astype(np.uint8)
 
 
-def random_coarse_v2(mask):
+def random_coarse_erode(mask):
     """
     erode
     """
@@ -143,12 +143,29 @@ def random_coarse_distanza(mask, sigma_noise=12, blur_sigma=6.0, bias=12):
 
 
 class CoarseMaskDataset(Dataset):
+    """
+    Dataset for loading images and their corresponding coarse masks.
+    Args:
+        dataset_dir (str): Directory containing the dataset.
+        transform_type (str): Type of transformation to apply to the masks.
+        mode (str): Mode for loading images ("gray" or "rgb").
+        max_masks (int): Maximum number of masks to load per image.
+        image_gradient (bool): Whether to compute and include image gradient in the output.
+
+    Returns on __getitem__:
+        input_tensor (torch.Tensor): Input tensor containing the coarse mask and image.
+            Structure is [coarse_mask, image (RGB -> 3 channels, gray -> 1 channel), (optional) gradient].
+            So that coarse_mask is always at pos [0], image at [1:-1], and gradient at [-1].
+        gt_mask (torch.Tensor): Ground truth mask tensor.
+    """
+
     def __init__(
         self, 
         dataset_dir: str, 
-        transform_type: str = "v2", 
+        transform_type: str = "erode", 
         mode: str = "gray",
-        max_masks: int | None = None,
+        max_masks: int = 1,
+        image_gradient: bool = False  
     ):
         self.img_dir = os.path.join(dataset_dir, 'train2014')
         self.ann_file = os.path.join(dataset_dir, 'annotations', 'instances_train2014.json')
@@ -156,14 +173,13 @@ class CoarseMaskDataset(Dataset):
         self.coco = COCO(self.ann_file)
         self.mode = mode  # "gray", "rgb"
         self.max_masks = max_masks
+        self.image_gradient = image_gradient 
         all_ids = list(self.coco.imgs.keys())
         self.ids = [img_id for img_id in all_ids if len(self.coco.getAnnIds(imgIds=img_id)) > 0]
-
 
     def __len__(self):
         return len(self.ids)
 
-    
     def __getitem__(self, idx):
         img_id = self.ids[idx]
         img_info = self.coco.loadImgs(img_id)[0]
@@ -172,10 +188,9 @@ class CoarseMaskDataset(Dataset):
         # Load and convert image
         if self.mode == "gray":
             image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            
         elif self.mode == "rgb":
             image = cv2.imread(img_path)
-            image = image[:,:,::-1]  # FIXME
+            image = image[:,:,::-1]  # BGR to RGB
         else:
             raise ValueError("wrong mode")
         
@@ -186,51 +201,50 @@ class CoarseMaskDataset(Dataset):
         if not anns:
             raise ValueError(f"No annotations found for image id {img_id}")
 
-        # Seleziona annotazioni
-        if self.max_masks is None or self.max_masks == 1:
-            # Prende la migliore annotazione (quella con area massima)
-            best_ann = max(anns, key=lambda ann: ann['area'])
-            selected_anns = [best_ann]
-        else:
-            selected_anns = sorted(anns, key=lambda ann: ann['area'], reverse=True)[:self.max_masks]
+        # Select annotations
+        selected_anns = sorted(anns, key=lambda ann: ann['area'], reverse=True)[:self.max_masks]
 
-        # Crea maschera GT
         gt_mask = np.zeros((img_info['height'], img_info['width']), dtype=np.uint8)
         for ann in selected_anns:
             gt_mask += self.coco.annToMask(ann)
 
         gt_mask = np.clip(gt_mask, 0, 1)
 
-        # # Crea coarse mask
-        # if self.coarse_mask_fn is not None:
-        #     coarse_mask = self.coarse_mask_fn(gt_mask)
-        # else:
-        #     coarse_mask = gt_mask.copy()
-        
+        # Apply coarse transform
         if self.transform_type == "v1":
             coarse_mask = random_coarse(gt_mask)
-        elif self.transform_type == "v2":
-            coarse_mask = random_coarse_v2(gt_mask)
+        elif self.transform_type == "erode":
+            coarse_mask = random_coarse_paintbrush(gt_mask)
+        elif self.transform_type == "paintbrush":
+            coarse_mask = random_coarse_erode(gt_mask)
         elif self.transform_type == "dist":
             coarse_mask = random_coarse_distanza(gt_mask)
         else:
             raise ValueError("Unknown transform type")
 
-        # # Applica transform
-        # if self.transform is not None:
-        #     image = self.transform(image)
-        #     gt_mask = torch.from_numpy(gt_mask).unsqueeze(0).float()
-        #     coarse_mask = torch.from_numpy(coarse_mask).unsqueeze(0).float()
-        # else:
-        #     image = T.ToTensor()(image)
-        #     gt_mask = torch.from_numpy(gt_mask).unsqueeze(0).float()
-        #     coarse_mask = torch.from_numpy(coarse_mask).unsqueeze(0).float()
-
-        image = T.ToTensor()(image)
+        # Convert to tensor
+        image_tensor = T.ToTensor()(image)  # C x H x W
         gt_mask = torch.from_numpy(gt_mask).unsqueeze(0).float()
         coarse_mask = torch.from_numpy(coarse_mask).unsqueeze(0).float()
 
-        # Input = immagine + coarse mask
-        input_tensor = torch.cat([image, coarse_mask], dim=0)
+        # Optional: compute and stack gradient
+        if self.image_gradient:
+            if self.mode == "rgb":
+                gray_img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+            else:
+                gray_img = image
+
+            # Compute gradient magnitude using Sobel
+            grad_x = cv2.Sobel(gray_img, cv2.CV_32F, 1, 0, ksize=3)
+            grad_y = cv2.Sobel(gray_img, cv2.CV_32F, 0, 1, ksize=3)
+            grad_mag = np.sqrt(grad_x ** 2 + grad_y ** 2)
+            grad_mag = (grad_mag / (grad_mag.max() + 1e-8))  # Normalize to [0, 1]
+            grad_tensor = torch.from_numpy(grad_mag).unsqueeze(0).float()  # 1 x H x W
+
+            # Put coarse first, then gradient, then image
+            input_tensor = torch.cat([coarse_mask, image_tensor, grad_tensor], dim=0)
+        else:
+            # Put coarse first, then image
+            input_tensor = torch.cat([coarse_mask, image_tensor], dim=0)
 
         return input_tensor, gt_mask

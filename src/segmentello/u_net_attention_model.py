@@ -3,8 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-
-
+from scipy.ndimage import laplace
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -107,46 +106,123 @@ class DiceLoss(nn.Module):
         return 1 - dice
 
 
-def compute_iou(
-    pred_mask: torch.Tensor, 
-    true_mask: torch.Tensor
-) -> torch.Tensor:
-    """
-    Intersection over Union for a binary segmentation mask.
+class BoundaryLoss(nn.Module):
+    def forward(self, pred, target):
+        # Both pred and target are logits
+        pred = torch.sigmoid(pred)
+        pred_edge = laplace(pred.cpu().numpy())
+        target_edge = laplace(target.cpu().numpy())
+        pred_edge = torch.tensor(pred_edge, device=pred.device)
+        target_edge = torch.tensor(target_edge, device=target.device)
+        return F.mse_loss(pred_edge, target_edge)
 
-    Returns a torch.Tensor with only one iou float number
+
+class RefinementLoss(nn.Module):
     """
-    # Ensure binary
+    Loss for refining coarse masks to match GT masks.
+    Encourages:
+    - recovering missing GT (coarse=0, GT=1),
+    - removing coarse hallucinations (coarse=1, GT=0),
+    - penalizing hallucinated new regions (coarse=0, GT=0).
+    """
+    def __init__(self, weights=REFINEMENT_PENALTY, threshold=0.5):
+        super().__init__()
+        # Default weights
+        self.weights = weights
+        # Threshold for coarse mask values to be converted to 0 or 1
+        self.threshold = threshold
+
+    def forward(self, preds, gt, coarse):
+        preds = torch.sigmoid(preds)
+        gt = gt.float()
+        
+        # Apply threshold to coarse mask to classify as 0 or 1
+        coarse = (coarse > self.threshold).float()
+
+        # Masks
+        recover_mask = (gt == 1) & (coarse == 0)
+        delete_mask = (gt == 0) & (coarse == 1)
+        hallucinate_mask = (gt == 0) & (coarse == 0)
+        soft_penalty_mask = (gt == 0) & (coarse == 1)
+
+        # Reshape masks to match preds
+        recover_mask = recover_mask.squeeze(0).expand_as(preds)  # Add batch and channel dimension
+        delete_mask = delete_mask.squeeze(0).expand_as(preds)
+        hallucinate_mask = hallucinate_mask.squeeze(0).expand_as(preds)
+        soft_penalty_mask = soft_penalty_mask.squeeze(0).expand_as(preds)
+
+        loss = 0.0
+        if recover_mask.any():
+            loss += self.weights['recover'] * F.binary_cross_entropy(preds[recover_mask], gt[recover_mask])
+        if delete_mask.any():
+            loss += self.weights['delete'] * F.binary_cross_entropy(preds[delete_mask], gt[delete_mask])
+        if hallucinate_mask.any():
+            loss += self.weights['hallucinate'] * F.binary_cross_entropy(preds[hallucinate_mask], gt[hallucinate_mask])
+        if soft_penalty_mask.any():
+            loss += self.weights['soft_penalty'] * F.binary_cross_entropy(preds[soft_penalty_mask], gt[soft_penalty_mask])
+
+        return loss
+
+
+def compute_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
-
     intersection = (pred_mask * true_mask).sum()
     union = pred_mask.sum() + true_mask.sum() - intersection
     iou = intersection / union if union > 0 else torch.tensor(1.0) if intersection == 0 else torch.tensor(0.0)
     return iou
 
-
 class Coarse2FineUNet(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, in_channels=3, out_channels=1, lr=1e-3,
+                 starting_loss_weights=None, refinement_penalty=None,
+                 learnable_weights=True):
         super().__init__()
-        self.model = UNet(in_channels=2, out_channels=1)
-        # self.loss_fn = nn.BCEWithLogitsLoss()
+        self.model = UNet(in_channels=in_channels, out_channels=out_channels)
+
+        # Loss functions
         self.bce = nn.BCEWithLogitsLoss()
         self.dice = DiceLoss()
+        self.boundary = BoundaryLoss()
+        self.refine = RefinementLoss(weights=refinement_penalty)
 
-    def compute_loss(self, preds, targets):
-        """
-        helper function to compute same loss in the training and in the 
-        validation step
-        """
-        bce_loss = self.bce(preds, targets)
-        dice_loss = self.dice(preds, targets)
-        return 0.5 * bce_loss + 0.5 * dice_loss
+        # Loss weights
+        default_weights = starting_loss_weights or [0.3, 0.2, 0.2, 0.3]
+        if learnable_weights:
+            self.loss_weights = nn.Parameter(torch.tensor(default_weights), requires_grad=True)
+        else:
+            self.register_buffer("loss_weights", torch.tensor(default_weights))  # static weights
 
+        self.learnable_weights = learnable_weights
+        self.lr = lr
 
     def forward(self, x):
         return self.model(x)
 
+    def compute_loss(self, preds, targets, coarse):
+        # Individual losses
+        bce_loss = self.bce(preds, targets)
+        dice_loss = self.dice(preds, targets)
+        boundary_loss = self.boundary(preds, targets)
+        refinement_loss = self.refine(preds, targets, coarse)
+
+        # Normalize weights using softmax
+        weights = F.softmax(self.loss_weights, dim=0)
+        total_loss = (
+            weights[0] * bce_loss +
+            weights[1] * dice_loss +
+            weights[2] * boundary_loss +
+            weights[3] * refinement_loss
+        )
+
+        # Logging component losses
+        self.log("loss_bce", bce_loss, prog_bar=True)
+        self.log("loss_dice", dice_loss, prog_bar=True)
+        self.log("loss_boundary", boundary_loss, prog_bar=True)
+        self.log("loss_refine", refinement_loss, prog_bar=True)
+        #   for name, weight in zip(ORDER_LOSS_WEIGHTS, weights):
+        #       self.log(f"loss_weight_{name}", weight.item(), prog_bar=True)
+
+        return total_loss
 
     def training_step(self, batch, batch_idx):
         x_list, y_list = batch
@@ -154,50 +230,32 @@ class Coarse2FineUNet(pl.LightningModule):
         for x, y in zip(x_list, y_list):
             x = x.unsqueeze(0).to(self.device)
             y = y.unsqueeze(0).to(self.device)
+            coarse = x[:, 0:1, :, :]
+
             logits = self(x)
-            loss = self.compute_loss(logits, x)
+            loss = self.compute_loss(logits, y, coarse)
             losses.append(loss)
+
         total_loss = torch.stack(losses).mean()
         self.log("train_loss", total_loss, prog_bar=True)
         return total_loss
 
-
     def validation_step(self, batch, batch_idx):
-        images, masks = batch
-        preds = self(images)
-        targets = masks.squeeze(1).float()
+        x, y = batch
+        coarse = x[:, 0:1, :, :]
+        preds = self(x)
+        targets = y.squeeze(1).float()
         preds = preds.squeeze(1)
 
-        loss = self.compute_loss(preds, targets)
+        loss = self.compute_loss(preds, targets, coarse)
 
-        # Compute IoU
-        preds_class = (torch.sigmoid(preds) > 0.5).float()  # binarize logits after sigmoid
-        ious = []
-        for i in range(images.size(0)):
-            iou = compute_iou(preds_class[i], targets[i])
-            ious.append(iou)
-        batch_iou = torch.mean(torch.stack(ious))
+        preds_class = (torch.sigmoid(preds) > 0.5).float()
+        ious = [compute_iou(preds_class[i], targets[i]) for i in range(x.size(0))]
+        batch_iou = torch.stack(ious).mean()
 
         self.log('val_loss', loss, on_epoch=True, prog_bar=True)
         self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
         return loss
 
-
-    def test_step(self, batch, batch_idx):
-        images, masks = batch
-        preds = self(images)
-        preds_class = torch.argmax(preds, dim=1)
-
-        ious = []
-        for i in range(images.size(0)):
-            iou = compute_iou(preds_class[i], masks[i].squeeze(0))
-            ious.append(iou)
-
-        batch_iou = torch.mean(torch.stack(ious))
-        self.log('test_iou', batch_iou, on_step=False, on_epoch=True, prog_bar=True)
-        return batch_iou
-
-
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=LR)
-        return optimizer
+        return torch.optim.Adam(self.parameters(), lr=self.lr)

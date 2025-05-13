@@ -9,3 +9,4 @@ scratches
 **/coarse_masks/
 lightning_logs
 .vscode
+reduced_dset_*/
