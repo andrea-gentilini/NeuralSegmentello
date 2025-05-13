@@ -9,6 +9,10 @@ from pycocotools.coco import COCO
 import random
 
 
+import random
+import numpy as np
+import cv2
+
 def random_coarse(mask):
     # Convert to uint8 and ensure contiguous
     mask = np.ascontiguousarray((mask * 255).astype(np.uint8))
@@ -20,13 +24,14 @@ def random_coarse(mask):
     # Get coordinates where noise can be placed (in edge band)
     edge_coords = np.column_stack(np.where(contour_band > 0))
 
+    if len(edge_coords) == 0:
+        return mask  # Return the original mask if no edge is detected
+
     noise = np.zeros_like(mask, dtype=np.uint8)
 
     # Add random circles only around the contour area
     num_circles = random.randint(15, 40)
     for _ in range(num_circles):
-        if len(edge_coords) == 0:
-            break
         y, x = edge_coords[random.randint(0, len(edge_coords) - 1)]
         radius = random.randint(3, 10)
         cv2.circle(noise, (x, y), radius, 255, -1)
@@ -56,19 +61,22 @@ def random_coarse(mask):
 def random_coarse_paintbrush(mask):
     mask = np.ascontiguousarray((mask > 0).astype(np.uint8) * 255)
 
-    band_width   = random.randint(15, 40)                      
+    band_width = random.randint(15, 40)
     contour_band = cv2.dilate(mask,
                               cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
                                                         (band_width, band_width)),
                               iterations=1)
     contour_band = cv2.subtract(contour_band, mask)
-    edge_coords  = np.column_stack(np.where(contour_band > 0))
+    edge_coords = np.column_stack(np.where(contour_band > 0))
+
+    if len(edge_coords) == 0:
+        return mask  # Return the original mask if no edge is detected
 
     noise = np.zeros_like(mask, np.uint8)
-    num_circles = random.randint(8, 18)                        
+    num_circles = random.randint(8, 18)
     for _ in range(num_circles):
         y, x = edge_coords[random.randrange(len(edge_coords))]
-        radius = random.randint(band_width//2, band_width)     
+        radius = random.randint(band_width//2, band_width)
         cv2.circle(noise, (x, y), radius, 255, -1)
 
     mask = cv2.bitwise_or(mask, noise)
@@ -90,7 +98,6 @@ def random_coarse_erode(mask):
     """
     mask = np.ascontiguousarray((mask > 0).astype(np.uint8) * 255)
 
-    # band_width = random.randint(15, 40)                       
     band_width = random.randint(30, 40)                       
     contour_band = cv2.erode(
         mask,
@@ -103,8 +110,11 @@ def random_coarse_erode(mask):
     contour_band = cv2.subtract(mask, contour_band)
     edge_coords = np.column_stack(np.where(contour_band > 0))
 
+    if len(edge_coords) == 0:
+        return mask  # Return the original mask if no edge is detected
+
     noise = np.zeros_like(mask, np.uint8)
-    num_circles = random.randint(2, 6)                       
+    num_circles = random.randint(2, 6)
     for _ in range(num_circles):
         y, x = edge_coords[random.randrange(len(edge_coords))]
         radius = random.randint(band_width // 4, band_width // 2)  
@@ -140,6 +150,7 @@ def random_coarse_distanza(mask, sigma_noise=12, blur_sigma=6.0, bias=12):
     coarse = (d_hat > 0).astype(np.uint8)
 
     return coarse
+
 
 
 class CoarseMaskDataset(Dataset):
@@ -214,9 +225,9 @@ class CoarseMaskDataset(Dataset):
         if self.transform_type == "v1":
             coarse_mask = random_coarse(gt_mask)
         elif self.transform_type == "erode":
-            coarse_mask = random_coarse_paintbrush(gt_mask)
-        elif self.transform_type == "paintbrush":
             coarse_mask = random_coarse_erode(gt_mask)
+        elif self.transform_type == "paintbrush":
+            coarse_mask = random_coarse_paintbrush(gt_mask)
         elif self.transform_type == "dist":
             coarse_mask = random_coarse_distanza(gt_mask)
         else:
