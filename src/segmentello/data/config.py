@@ -4,7 +4,7 @@ import os
 BATCH_SIZE: int = 1
 LR: float = 1e-3
 NUM_WORKERS: int = 2
-EPOCHS: int = 100
+EPOCHS: int = 50
 SEED: int = 42
 TRAIN_VALID_SPLIT: float = 0.9
 STARTING_LOSS_WEIGHTS = [0.3, 0.2, 0.2, 0.3]

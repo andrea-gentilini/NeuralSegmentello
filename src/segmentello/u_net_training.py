@@ -6,13 +6,18 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import torch
 
+IMG_MODE = "gray"
+IMG_GRADIENT = True
+IN_CHANNELS = 1 + int(IMG_GRADIENT) + (3 if IMG_MODE == "RGB" else 1)
+
 def main() -> None:
     pl.seed_everything(SEED)
 
     full_dataset = CoarseMaskDataset(
         DATA_ADAPTATION_DIR, 
         transform_type="erode", 
-        image_gradient=True
+        image_gradient=IMG_GRADIENT,
+        mode=IMG_MODE
     )
 
     total_len = len(full_dataset)
@@ -37,7 +42,7 @@ def main() -> None:
     )
     early_stop_callback = EarlyStopping(
         monitor=MONITOR_METRIC,
-        patience=10,
+        patience=EPOCHS // 10,
         verbose=True,
         mode="min"
     )
@@ -48,6 +53,7 @@ def main() -> None:
     )
 
     model = Coarse2FineUNet(
+        in_channels=IN_CHANNELS,
         lr=LR,
         starting_loss_weights=STARTING_LOSS_WEIGHTS,
         refinement_penalty=REFINEMENT_PENALTY,

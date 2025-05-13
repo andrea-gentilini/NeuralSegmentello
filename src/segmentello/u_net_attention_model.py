@@ -110,10 +110,15 @@ class BoundaryLoss(nn.Module):
     def forward(self, pred, target):
         # Both pred and target are logits
         pred = torch.sigmoid(pred)
-        pred_edge = laplace(pred.cpu().numpy())
-        target_edge = laplace(target.cpu().numpy())
+        
+        # Use detach() to break the computation graph and allow numpy conversion
+        pred_edge = laplace(pred.detach().cpu().numpy())
+        target_edge = laplace(target.detach().cpu().numpy())
+        
+        # Convert back to tensor and ensure they are on the same device as pred and target
         pred_edge = torch.tensor(pred_edge, device=pred.device)
         target_edge = torch.tensor(target_edge, device=target.device)
+        
         return F.mse_loss(pred_edge, target_edge)
 
 
