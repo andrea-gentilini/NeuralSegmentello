@@ -13,7 +13,7 @@ ORDER_LOSS_WEIGHTS = ["bce", "dice", "boundary", "refine"]
 # lightning callbacks
 SAVE_TOP_K: int = 1
 MONITOR_METRIC: str = "val_loss"
-MODEL_CHECKPOINT_DIR: str = "checkpoints/"
+MODEL_CHECKPOINT_DIR: str = "checkpoints"
 
 # loss configs
 REFINEMENT_PENALTY = {

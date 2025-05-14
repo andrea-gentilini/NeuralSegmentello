@@ -10,3 +10,5 @@ scratches
 lightning_logs
 .vscode
 reduced_dset_*/
+checkpoints
+.rsyncignore

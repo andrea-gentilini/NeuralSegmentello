@@ -15,7 +15,7 @@ def main() -> None:
 
     full_dataset = CoarseMaskDataset(
         DATA_ADAPTATION_DIR, 
-        transform_type="erode", 
+        transform_type="paintbrush", 
         image_gradient=IMG_GRADIENT,
         mode=IMG_MODE
     )
@@ -36,9 +36,10 @@ def main() -> None:
         dirpath=MODEL_CHECKPOINT_DIR,
         filename="best-checkpoint",
         save_top_k=SAVE_TOP_K,
+        save_last=True,  # save last ckpt to resume training
         verbose=True,
         monitor=MONITOR_METRIC,
-        mode="min"
+        mode="min",
     )
     early_stop_callback = EarlyStopping(
         monitor=MONITOR_METRIC,
@@ -57,13 +58,14 @@ def main() -> None:
         lr=LR,
         starting_loss_weights=STARTING_LOSS_WEIGHTS,
         refinement_penalty=REFINEMENT_PENALTY,
-        learnable_weights=False
+        learnable_weights=False,
     )
     
     trainer.fit(
         model,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
+        ckpt_path="checkpoints/best-checkpoint-v1.ckpt",
     )
 
 

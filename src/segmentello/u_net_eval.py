@@ -1,6 +1,7 @@
 from data.config import *
 from u_net_training import CoarseMaskDataset, Coarse2FineUNet
 import torch
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -47,12 +48,43 @@ def plot_result(
     plt.show()
 
 
+def evaluate_checkpoint(ckpt_dir: str) -> None:
+    metrics_csv: str = os.path.join(ckpt_dir, "metrics.csv")
+    df: pd.DataFrame = pd.read_csv(metrics_csv)
+
+    train_df = df[df['train_loss'].notnull()]
+    val_df = df[df['val_loss'].notnull()]
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(train_df['step'], train_df['train_loss'], label='Train Loss', marker='o')
+    plt.plot(val_df['step'], val_df['val_loss'], label='Validation Loss', marker='s')
+    plt.xlabel('Step')
+    plt.ylabel('Loss')
+    # plt.yscale("log")
+    plt.title('Train and Validation Loss over Steps')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    for loss in ["loss_bce","loss_boundary","loss_dice","loss_refine","val_iou"]:
+        plt.plot(df["step"], df[loss])
+        plt.title(loss)
+        # plt.yscale("log")
+        plt.show()
+
 
 def main() -> None:
 
-    dataset_gray = CoarseMaskDataset(DATA_ADAPTATION_DIR, transform_type="v2")
+    # dataset_gray = CoarseMaskDataset(DATA_ADAPTATION_DIR, transform_type="v2")
+    dataset_gray = CoarseMaskDataset(
+        DATA_ADAPTATION_DIR, 
+        transform_type="erode",
+        image_gradient=True,
+    )
 
-    model_path: str = "lightning_logs/version_1/checkpoints/epoch=9-step=490.ckpt"
+    # model_path: str = "lightning_logs/version_1/checkpoints/epoch=9-step=490.ckpt"
+    model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
     model = Coarse2FineUNet.load_from_checkpoint(model_path)
 
     # sample = dataset_gray[0]
@@ -66,6 +98,7 @@ def main() -> None:
         # predicted = model(item.unsqueeze(0))
 
     plot_result(dataset_gray, model, num_samples=5)
+    # evaluate_checkpoint("checkpoints/erode_13052025")
 
 if __name__ == "__main__":
-  main()
+    main()
