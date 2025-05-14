@@ -9,10 +9,6 @@ from pycocotools.coco import COCO
 import random
 
 
-import random
-import numpy as np
-import cv2
-
 def random_coarse(mask):
     # Convert to uint8 and ensure contiguous
     mask = np.ascontiguousarray((mask * 255).astype(np.uint8))
@@ -237,8 +233,11 @@ class CoarseMaskDataset(Dataset):
         else:
             raise ValueError("Unknown transform type")
 
+
+        # Skip if the coarse mask is too small (zero or very small area)
+        if np.sum(coarse_mask) < 50:
+            return self.__getitem__((idx + 1) % len(self))
         # Convert to tensor
-        # image_tensor = T.ToTensor()(image)  # C x H x W
         image_tensor = torch.from_numpy(image)
         gt_mask = torch.from_numpy(gt_mask).unsqueeze(0).float()
         coarse_mask = torch.from_numpy(coarse_mask).unsqueeze(0).float()
@@ -271,3 +270,24 @@ class CoarseMaskDataset(Dataset):
             input_tensor = torch.cat([coarse_mask, image_tensor], dim=0)
 
         return input_tensor, gt_mask
+    
+
+def collate_fn(batch):
+    x_list, y_list = zip(*batch)
+    x = torch.stack(x_list)  # [B, 3, H, W]
+    y = torch.stack(y_list)  # [B, 1, H, W]
+    return x, y
+
+
+# Dataset finto con 1 sola immagine
+class SingleSampleDataset(Dataset):
+    def __init__(self, item):
+        # self.img = img.unsqueeze(0)
+        # self.coarse = coarse.unsqueeze(0)
+        # self.gt = gt.unsqueeze(0)
+        self.item = item
+
+    def __len__(self): return 1000  # tanti batch con la stessa immagine
+    def __getitem__(self, idx): 
+        # return self.img, self.coarse, self.gt
+        return self.item

@@ -1,7 +1,9 @@
 from data.config import *
-from dataset import CoarseMaskDataset
+from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
 from u_net_attention_model import Coarse2FineUNet
 from u_net_small import Coarse2FineUNetSmall
+from u_net_tiny import Coarse2FineTiny
+from u_net_tiny_res import Coarse2FineTinyRes
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
@@ -30,13 +32,15 @@ def main() -> None:
         train_dataset, 
         batch_size=BATCH_SIZE, 
         shuffle=True, 
-        num_workers=NUM_WORKERS
+        num_workers=NUM_WORKERS,
+        collate_fn=collate_fn,
     )
     val_loader = DataLoader(
         val_dataset, 
         batch_size=BATCH_SIZE, 
         shuffle=False, 
-        num_workers=NUM_WORKERS
+        num_workers=NUM_WORKERS,
+        collate_fn=collate_fn,
     )
 
     checkpoint_callback = ModelCheckpoint(
@@ -60,6 +64,17 @@ def main() -> None:
         log_every_n_steps=5,
     )
 
+
+    # 1 img dataset
+    
+    # dumb_dataset = SingleSampleDataset(full_dataset[0])
+    # dumb_dl = DataLoader(
+    #     dumb_dataset, 
+    #     batch_size=1, 
+    #     shuffle=False, 
+    #     num_workers=NUM_WORKERS
+    # )
+
     # model = Coarse2FineUNet(
     #     in_channels=IN_CHANNELS,
     #     lr=LR,
@@ -67,14 +82,16 @@ def main() -> None:
     #     refinement_penalty=REFINEMENT_PENALTY,
     #     learnable_weights=False,
     # )
-    model = Coarse2FineUNetSmall(
-        in_channels=IN_CHANNELS,
-        lr=LR,
-        starting_loss_weights=STARTING_LOSS_WEIGHTS,
-        refinement_penalty=REFINEMENT_PENALTY,
-        learnable_weights=False,
-    )
+    # model = Coarse2FineUNetSmall(
+    #     in_channels=IN_CHANNELS,
+    #     lr=LR,
+    #     starting_loss_weights=STARTING_LOSS_WEIGHTS,
+    #     refinement_penalty=REFINEMENT_PENALTY,
+    #     learnable_weights=False,
+    # )
     
+    # model = Coarse2FineTiny()
+    model = Coarse2FineTinyRes()
     trainer.fit(
         model,
         train_dataloaders=train_loader,
@@ -82,6 +99,12 @@ def main() -> None:
         # ckpt_path="checkpoints/best-checkpoint-v1.ckpt",
     )
 
+    # # 1 img dataset overfitting test
+    # model = Coarse2FineTiny()
+    # trainer.fit(
+    #     model,
+    #     train_dataloaders=dumb_dl
+    # )
 
 if __name__ == "__main__":
     main()

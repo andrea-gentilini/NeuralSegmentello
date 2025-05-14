@@ -1,5 +1,8 @@
 from data.config import *
 from u_net_training import CoarseMaskDataset, Coarse2FineUNet
+from u_net_small import Coarse2FineUNetSmall
+from u_net_tiny import Coarse2FineTiny
+from u_net_tiny_res import Coarse2FineTinyRes
 import torch
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -18,7 +21,7 @@ def plot_result(
     plt.figure(figsize=(n_cols * 4, n_rows * 4))
 
     for i in range(n_rows):  # FIXME, sample in enumerate(dataset[:n_rows]):
-        item, target = dataset[i]
+        item, target = dataset[i+23]
         # item = sample[0]
         # target = sample[1]
         # print(f"{item.shape = }")
@@ -67,11 +70,22 @@ def evaluate_checkpoint(ckpt_dir: str) -> None:
     plt.tight_layout()
     plt.show()
 
-    for loss in ["loss_bce","loss_boundary","loss_dice","loss_refine","val_iou"]:
+    for loss in [
+        "loss_bce",
+        # "loss_boundary",
+        "loss_dice",
+        # "loss_refine",
+        # "val_iou"
+    ]:
         plt.plot(df["step"], df[loss])
         plt.title(loss)
         # plt.yscale("log")
         plt.show()
+
+    plt.plot(val_df["step"], val_df["val_iou"])
+    plt.xlabel("Step")
+    plt.ylabel("Validation Intersection over Union")
+    plt.show()
 
 
 def main() -> None:
@@ -84,8 +98,14 @@ def main() -> None:
     )
 
     # model_path: str = "lightning_logs/version_1/checkpoints/epoch=9-step=490.ckpt"
-    model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
-    model = Coarse2FineUNet.load_from_checkpoint(model_path)
+    # model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
+    # model_path: str = "checkpoints/erode_14052025/best-checkpoint.ckpt"
+    model_path: str = "checkpoints/u_net_tiny/best-checkpoint.ckpt"
+    model_path: str = "checkpoints/u_net_tiny_res/best-checkpoint.ckpt"
+    # model = Coarse2FineUNet.load_from_checkpoint(model_path)
+    # model = Coarse2FineUNetSmall.load_from_checkpoint(model_path)
+    # model = Coarse2FineTiny.load_from_checkpoint(model_path)
+    model = Coarse2FineTinyRes.load_from_checkpoint(model_path)
 
     # sample = dataset_gray[0]
     # item = sample[0]
@@ -98,7 +118,7 @@ def main() -> None:
         # predicted = model(item.unsqueeze(0))
 
     plot_result(dataset_gray, model, num_samples=5)
-    # evaluate_checkpoint("checkpoints/erode_13052025")
 
 if __name__ == "__main__":
     main()
+    evaluate_checkpoint("checkpoints/u_net_tiny_res")

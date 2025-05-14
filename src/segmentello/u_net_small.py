@@ -256,37 +256,40 @@ class Coarse2FineUNetSmall(pl.LightningModule):
         return total_loss
 
     def training_step(self, batch, batch_idx):
-        x_list, y_list = batch
-        losses = []
-        for x, y in zip(x_list, y_list):
-            x = x.unsqueeze(0).to(self.device)
-            y = y.unsqueeze(0).to(self.device)
-            coarse = x[:, 0:1, :, :]
+        x, y = batch  # x: [B, 3, H, W], y: [B, 1, H, W]
+        x = x.to(self.device)
+        y = y.to(self.device)
 
-            logits = self(x)
-            loss = self.compute_loss(logits, y, coarse)
-            losses.append(loss)
+        coarse = x[:, 0:1, :, :]        # [B, 1, H, W]
+        logits = self(x)                # [B, 1, H, W]
 
-        total_loss = torch.stack(losses).mean()
-        self.log("train_loss", total_loss, prog_bar=True)
-        return total_loss
+        loss = self.compute_loss(logits, y, coarse)
+
+        self.log("train_loss", loss, prog_bar=True)
+        return loss
+
 
     def validation_step(self, batch, batch_idx):
-        x, y = batch
-        coarse = x[:, 0:1, :, :]
-        preds = self(x)
-        targets = y.squeeze(1).float()
-        preds = preds.squeeze(1)
+        x, y = batch  # x: [B, 3, H, W], y: [B, 1, H, W]
+        x = x.to(self.device)
+        y = y.to(self.device)
 
-        loss = self.compute_loss(preds, targets, coarse)
+        coarse = x[:, 0:1, :, :]        # [B, 1, H, W]
+        preds = self(x)                 # [B, 1, H, W]
+
+        loss = self.compute_loss(preds, y, coarse)
 
         preds_class = (torch.sigmoid(preds) > 0.5).float()
-        ious = [compute_iou(preds_class[i], targets[i]) for i in range(x.size(0))]
+        targets = y.float()
+
+        # IoU per ogni sample nel batch
+        ious = [compute_iou(preds_class[i, 0], targets[i, 0]) for i in range(x.size(0))]
         batch_iou = torch.stack(ious).mean()
 
         self.log('val_loss', loss, on_epoch=True, prog_bar=True)
         self.log('val_iou', batch_iou, on_epoch=True, prog_bar=True)
         return loss
+
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
