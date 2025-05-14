@@ -238,9 +238,17 @@ class CoarseMaskDataset(Dataset):
             raise ValueError("Unknown transform type")
 
         # Convert to tensor
-        image_tensor = T.ToTensor()(image)  # C x H x W
+        # image_tensor = T.ToTensor()(image)  # C x H x W
+        image_tensor = torch.from_numpy(image)
         gt_mask = torch.from_numpy(gt_mask).unsqueeze(0).float()
         coarse_mask = torch.from_numpy(coarse_mask).unsqueeze(0).float()
+
+        image_tensor = image_tensor.float() / 255.0
+        if self.mode == "rgb":
+            image_tensor = image_tensor.permute(2, 0, 1)  # HWC -> CHW
+        elif self.mode == "gray":
+            image_tensor = image_tensor.unsqueeze(0)  # HW -> 1 x H x W
+
 
         # Optional: compute and stack gradient
         if self.image_gradient:

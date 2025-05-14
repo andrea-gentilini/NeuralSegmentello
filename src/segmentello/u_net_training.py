@@ -1,6 +1,7 @@
 from data.config import *
 from dataset import CoarseMaskDataset
 from u_net_attention_model import Coarse2FineUNet
+from u_net_small import Coarse2FineUNetSmall
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
@@ -25,8 +26,18 @@ def main() -> None:
         generator=torch.Generator().manual_seed(SEED)
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
-    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=BATCH_SIZE, 
+        shuffle=True, 
+        num_workers=NUM_WORKERS
+    )
+    val_loader = DataLoader(
+        val_dataset, 
+        batch_size=BATCH_SIZE, 
+        shuffle=False, 
+        num_workers=NUM_WORKERS
+    )
 
     checkpoint_callback = ModelCheckpoint(
         dirpath=MODEL_CHECKPOINT_DIR,
@@ -49,7 +60,14 @@ def main() -> None:
         log_every_n_steps=5,
     )
 
-    model = Coarse2FineUNet(
+    # model = Coarse2FineUNet(
+    #     in_channels=IN_CHANNELS,
+    #     lr=LR,
+    #     starting_loss_weights=STARTING_LOSS_WEIGHTS,
+    #     refinement_penalty=REFINEMENT_PENALTY,
+    #     learnable_weights=False,
+    # )
+    model = Coarse2FineUNetSmall(
         in_channels=IN_CHANNELS,
         lr=LR,
         starting_loss_weights=STARTING_LOSS_WEIGHTS,
@@ -61,7 +79,7 @@ def main() -> None:
         model,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
-        ckpt_path="checkpoints/best-checkpoint-v1.ckpt",
+        # ckpt_path="checkpoints/best-checkpoint-v1.ckpt",
     )
 
 
