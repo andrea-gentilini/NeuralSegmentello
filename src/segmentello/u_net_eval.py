@@ -1,5 +1,5 @@
 from data.config import *
-from u_net_training import CoarseMaskDataset, Coarse2FineUNet
+from u_net_training import CoarseMaskDataset, Coarse2FineUNet, Coarse2FineUNetSmall
 import torch
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -84,8 +84,8 @@ def main() -> None:
     )
 
     # model_path: str = "lightning_logs/version_1/checkpoints/epoch=9-step=490.ckpt"
-    model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
-    model = Coarse2FineUNet.load_from_checkpoint(model_path)
+    model_path: str = "saved_models/erode_14052025/best-checkpoint.ckpt"
+    model = Coarse2FineUNetSmall.load_from_checkpoint(model_path)
 
     # sample = dataset_gray[0]
     # item = sample[0]
