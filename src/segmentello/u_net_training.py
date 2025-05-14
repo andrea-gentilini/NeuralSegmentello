@@ -6,16 +6,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import torch
 
-IMG_MODE = "gray"
-IMG_GRADIENT = True
-IN_CHANNELS = 1 + int(IMG_GRADIENT) + (3 if IMG_MODE == "RGB" else 1)
-
 def main() -> None:
     pl.seed_everything(SEED)
 
     full_dataset = CoarseMaskDataset(
         DATA_ADAPTATION_DIR, 
-        transform_type="paintbrush", 
+        transform_type=TRANSFORM_MODE, 
         image_gradient=IMG_GRADIENT,
         mode=IMG_MODE
     )

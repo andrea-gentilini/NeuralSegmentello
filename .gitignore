@@ -12,3 +12,4 @@ lightning_logs
 reduced_dset_*/
 checkpoints
 .rsyncignore
+saved_models

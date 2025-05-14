@@ -221,6 +221,10 @@ class CoarseMaskDataset(Dataset):
 
         gt_mask = np.clip(gt_mask, 0, 1)
 
+        if type(self.transform_type) == list:
+            # Randomly select a transform type from the list
+            self.transform_type = random.choice(self.transform_type)
+
         # Apply coarse transform
         if self.transform_type == "v1":
             coarse_mask = random_coarse(gt_mask)
