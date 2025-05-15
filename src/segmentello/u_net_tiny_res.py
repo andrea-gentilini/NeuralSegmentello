@@ -73,9 +73,9 @@ class DiceLoss(nn.Module):
 
 
 class Coarse2FineTinyRes(pl.LightningModule):
-    def __init__(self, lr=1e-3):
+    def __init__(self, lr=1e-3, features=[16, 32]):
         super().__init__()
-        self.model = UNetMini(in_channels=3, out_channels=1)
+        self.model = UNetMini(in_channels=3, out_channels=1, features=features)
         self.bce = nn.BCEWithLogitsLoss()
         self.dice = DiceLoss()
         self.lr = lr
@@ -84,7 +84,8 @@ class Coarse2FineTinyRes(pl.LightningModule):
         coarse_mask = x[:, 0:1, :, :]  
         residual = self.model(x)       
         refined = coarse_mask + residual
-        return torch.sigmoid(refined)
+        # return torch.sigmoid(refined)
+        return refined
 
     def training_step(self, batch, batch_idx):
         x, y = batch

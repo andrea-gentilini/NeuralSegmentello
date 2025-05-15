@@ -135,51 +135,51 @@ class SobelLoss(nn.Module):
         return F.mse_loss(grad_pred, grad_target)
 
 
-class RefinementLoss(nn.Module):
-    """
-    Loss for refining coarse masks to match GT masks.
-    Encourages:
-    - recovering missing GT (coarse=0, GT=1),
-    - removing coarse hallucinations (coarse=1, GT=0),
-    - penalizing hallucinated new regions (coarse=0, GT=0).
-    """
-    def __init__(self, weights=REFINEMENT_PENALTY, threshold=0.5):
-        super().__init__()
-        # Default weights
-        self.weights = weights
-        # Threshold for coarse mask values to be converted to 0 or 1
-        self.threshold = threshold
+# class RefinementLoss(nn.Module):
+#     """
+#     Loss for refining coarse masks to match GT masks.
+#     Encourages:
+#     - recovering missing GT (coarse=0, GT=1),
+#     - removing coarse hallucinations (coarse=1, GT=0),
+#     - penalizing hallucinated new regions (coarse=0, GT=0).
+#     """
+#     def __init__(self, weights=REFINEMENT_PENALTY, threshold=0.5):
+#         super().__init__()
+#         # Default weights
+#         self.weights = weights
+#         # Threshold for coarse mask values to be converted to 0 or 1
+#         self.threshold = threshold
 
-    def forward(self, preds, gt, coarse):
-        preds = torch.sigmoid(preds)
-        gt = gt.float()
+#     def forward(self, preds, gt, coarse):
+#         preds = torch.sigmoid(preds)
+#         gt = gt.float()
         
-        # Apply threshold to coarse mask to classify as 0 or 1
-        coarse = (coarse > self.threshold).float()
+#         # Apply threshold to coarse mask to classify as 0 or 1
+#         coarse = (coarse > self.threshold).float()
 
-        # Masks
-        recover_mask = (gt == 1) & (coarse == 0)
-        delete_mask = (gt == 0) & (coarse == 1)
-        hallucinate_mask = (gt == 0) & (coarse == 0)
-        soft_penalty_mask = (gt == 0) & (coarse == 1)
+#         # Masks
+#         recover_mask = (gt == 1) & (coarse == 0)
+#         delete_mask = (gt == 0) & (coarse == 1)
+#         hallucinate_mask = (gt == 0) & (coarse == 0)
+#         soft_penalty_mask = (gt == 0) & (coarse == 1)
 
-        # Reshape masks to match preds
-        recover_mask = recover_mask.squeeze(0).expand_as(preds)  # Add batch and channel dimension
-        delete_mask = delete_mask.squeeze(0).expand_as(preds)
-        hallucinate_mask = hallucinate_mask.squeeze(0).expand_as(preds)
-        soft_penalty_mask = soft_penalty_mask.squeeze(0).expand_as(preds)
+#         # Reshape masks to match preds
+#         recover_mask = recover_mask.squeeze(0).expand_as(preds)  # Add batch and channel dimension
+#         delete_mask = delete_mask.squeeze(0).expand_as(preds)
+#         hallucinate_mask = hallucinate_mask.squeeze(0).expand_as(preds)
+#         soft_penalty_mask = soft_penalty_mask.squeeze(0).expand_as(preds)
 
-        loss = 0.0
-        if recover_mask.any():
-            loss += self.weights['recover'] * F.binary_cross_entropy(preds[recover_mask], gt[recover_mask])
-        if delete_mask.any():
-            loss += self.weights['delete'] * F.binary_cross_entropy(preds[delete_mask], gt[delete_mask])
-        if hallucinate_mask.any():
-            loss += self.weights['hallucinate'] * F.binary_cross_entropy(preds[hallucinate_mask], gt[hallucinate_mask])
-        if soft_penalty_mask.any():
-            loss += self.weights['soft_penalty'] * F.binary_cross_entropy(preds[soft_penalty_mask], gt[soft_penalty_mask])
+#         loss = 0.0
+#         if recover_mask.any():
+#             loss += self.weights['recover'] * F.binary_cross_entropy(preds[recover_mask], gt[recover_mask])
+#         if delete_mask.any():
+#             loss += self.weights['delete'] * F.binary_cross_entropy(preds[delete_mask], gt[delete_mask])
+#         if hallucinate_mask.any():
+#             loss += self.weights['hallucinate'] * F.binary_cross_entropy(preds[hallucinate_mask], gt[hallucinate_mask])
+#         if soft_penalty_mask.any():
+#             loss += self.weights['soft_penalty'] * F.binary_cross_entropy(preds[soft_penalty_mask], gt[soft_penalty_mask])
 
-        return loss
+#         return loss
 
 
 def compute_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
@@ -201,10 +201,10 @@ class Coarse2FineUNet(pl.LightningModule):
         self.bce = nn.BCEWithLogitsLoss()
         self.dice = DiceLoss()
         self.boundary = SobelLoss()
-        self.refine = RefinementLoss(weights=refinement_penalty)
+        # self.refine = RefinementLoss(weights=refinement_penalty)
 
         # Loss weights
-        default_weights = starting_loss_weights or [0.3, 0.2, 0.2, 0.3]
+        default_weights = starting_loss_weights or [0.3, 0.3, 0.3]
         if learnable_weights:
             self.loss_weights = nn.Parameter(torch.tensor(default_weights), requires_grad=True)
         else:
@@ -221,22 +221,22 @@ class Coarse2FineUNet(pl.LightningModule):
         bce_loss = self.bce(preds, targets)
         dice_loss = self.dice(preds, targets)
         boundary_loss = self.boundary(preds, targets)
-        refinement_loss = self.refine(preds, targets, coarse)
+        # refinement_loss = self.refine(preds, targets, coarse)
 
         # Normalize weights using softmax
         weights = F.softmax(self.loss_weights, dim=0)
         total_loss = (
             weights[0] * bce_loss +
             weights[1] * dice_loss +
-            weights[2] * boundary_loss +
-            weights[3] * refinement_loss
+            weights[2] * boundary_loss
+            # weights[3] * refinement_loss
         )
 
         # Logging component losses
         self.log("loss_bce", bce_loss, prog_bar=True)
         self.log("loss_dice", dice_loss, prog_bar=True)
         self.log("loss_boundary", boundary_loss, prog_bar=True)
-        self.log("loss_refine", refinement_loss, prog_bar=True)
+        # self.log("loss_refine", refinement_loss, prog_bar=True)
         #   for name, weight in zip(ORDER_LOSS_WEIGHTS, weights):
         #       self.log(f"loss_weight_{name}", weight.item(), prog_bar=True)
 

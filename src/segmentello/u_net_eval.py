@@ -21,7 +21,7 @@ def plot_result(
     plt.figure(figsize=(n_cols * 4, n_rows * 4))
 
     for i in range(n_rows):  # FIXME, sample in enumerate(dataset[:n_rows]):
-        item, target = dataset[i+23]
+        item, target = dataset[i+89]
         # item = sample[0]
         # target = sample[1]
         # print(f"{item.shape = }")
@@ -118,7 +118,8 @@ def main() -> None:
         # predicted = model(item.unsqueeze(0))
 
     plot_result(dataset_gray, model, num_samples=5)
+    evaluate_checkpoint("checkpoints/u_net_tiny_res")
+    # evaluate_checkpoint("checkpoints/u_net_tiny")
 
 if __name__ == "__main__":
     main()
-    evaluate_checkpoint("checkpoints/u_net_tiny_res")

@@ -74,9 +74,9 @@ class DiceLoss(nn.Module):
 
 
 class Coarse2FineTiny(pl.LightningModule):
-    def __init__(self, lr=1e-3):
+    def __init__(self, lr=1e-3, features=[16, 32]):
         super().__init__()
-        self.model = UNetMini(in_channels=3, out_channels=1)
+        self.model = UNetMini(in_channels=3, out_channels=1, features=features)
         self.bce = nn.BCEWithLogitsLoss()
         self.dice = DiceLoss()
         self.lr = lr

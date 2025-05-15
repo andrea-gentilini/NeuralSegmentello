@@ -20,7 +20,7 @@ def main() -> None:
     )
 
     total_len = len(full_dataset)
-    val_len = int(total_len * (1 - TRAIN_VALID_SPLIT))  # e.g., 10%
+    val_len = int(total_len * TRAIN_VALID_SPLIT)  # e.g., 10%
     train_len = total_len - val_len
     train_dataset, val_dataset = random_split(
         full_dataset, 
