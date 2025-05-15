@@ -1,6 +1,5 @@
 from data.config import *
 from u_net_training import CoarseMaskDataset, Coarse2FineUNet
-from u_net_small import Coarse2FineUNetSmall
 from u_net_tiny import Coarse2FineTiny
 from u_net_tiny_res import Coarse2FineTinyRes
 import torch
@@ -71,9 +70,9 @@ def evaluate_checkpoint(ckpt_dir: str) -> None:
     plt.show()
 
     for loss in [
-        "loss_bce",
+        # "loss_bce",
         # "loss_boundary",
-        "loss_dice",
+        # "loss_dice",
         # "loss_refine",
         # "val_iou"
     ]:
@@ -101,7 +100,7 @@ def main() -> None:
     # model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
     # model_path: str = "checkpoints/erode_14052025/best-checkpoint.ckpt"
     model_path: str = "checkpoints/u_net_tiny/best-checkpoint.ckpt"
-    model_path: str = "checkpoints/u_net_tiny_res/best-checkpoint.ckpt"
+    model_path: str = "checkpoints/u_net_tiny_res_fix/best-checkpoint.ckpt"
     # model = Coarse2FineUNet.load_from_checkpoint(model_path)
     # model = Coarse2FineUNetSmall.load_from_checkpoint(model_path)
     # model = Coarse2FineTiny.load_from_checkpoint(model_path)
@@ -118,7 +117,7 @@ def main() -> None:
         # predicted = model(item.unsqueeze(0))
 
     plot_result(dataset_gray, model, num_samples=5)
-    evaluate_checkpoint("checkpoints/u_net_tiny_res")
+    evaluate_checkpoint("checkpoints/u_net_tiny_res_fix")
     # evaluate_checkpoint("checkpoints/u_net_tiny")
 
 if __name__ == "__main__":

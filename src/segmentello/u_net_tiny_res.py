@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from u_net_attention_model import compute_iou
+from u_net_attention_model import compute_iou, SobelLoss
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels, num_groups=8):
@@ -73,11 +73,20 @@ class DiceLoss(nn.Module):
 
 
 class Coarse2FineTinyRes(pl.LightningModule):
-    def __init__(self, lr=1e-3, features=[16, 32]):
+    def __init__(self, lr=1e-3, features=[16, 32], losses=["bce", "dice"]):
+        """
+        losses: {"bce","dice","boundary"}
+        """
         super().__init__()
+        loss_to_class = {
+            "bce": nn.BCEWithLogitsLoss(),
+            "dice": DiceLoss(),
+            "boundary": SobelLoss(),
+        }
         self.model = UNetMini(in_channels=3, out_channels=1, features=features)
-        self.bce = nn.BCEWithLogitsLoss()
-        self.dice = DiceLoss()
+        # self.bce = nn.BCEWithLogitsLoss()
+        # self.dice = DiceLoss()
+        self.losses = [loss_to_class[loss] for loss in losses]
         self.lr = lr
 
     def forward(self, x):
@@ -86,13 +95,17 @@ class Coarse2FineTinyRes(pl.LightningModule):
         refined = coarse_mask + residual
         # return torch.sigmoid(refined)
         return refined
+    
+    def compute_loss(self, preds, y):
+        return sum([loss(preds, y) for loss in self.losses])
 
     def training_step(self, batch, batch_idx):
         x, y = batch
         x = x.to(self.device)
         y = y.to(self.device)
         preds = self(x)
-        loss = self.bce(preds, y) + self.dice(preds, y)
+        # loss = self.bce(preds, y) + self.dice(preds, y)
+        loss = self.compute_loss(preds, y)
         self.log("train_loss", loss, prog_bar=True)
         return loss
 
@@ -101,7 +114,8 @@ class Coarse2FineTinyRes(pl.LightningModule):
         x = x.to(self.device)
         y = y.to(self.device)
         preds = self(x)
-        loss = self.bce(preds, y) + self.dice(preds, y)
+        # loss = self.bce(preds, y) + self.dice(preds, y)
+        loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
         # Compute IoU for the batch

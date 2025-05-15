@@ -1,7 +1,6 @@
 from data.config import *
 from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
 from u_net_attention_model import Coarse2FineUNet
-from u_net_small import Coarse2FineUNetSmall
 from u_net_tiny import Coarse2FineTiny
 from u_net_tiny_res import Coarse2FineTinyRes
 from torch.utils.data import DataLoader, random_split
@@ -90,8 +89,8 @@ def main() -> None:
     #     learnable_weights=False,
     # )
     
-    # model = Coarse2FineTiny()
-    model = Coarse2FineTinyRes()
+    model = Coarse2FineTiny()
+    # model = Coarse2FineTinyRes()
     trainer.fit(
         model,
         train_dataloaders=train_loader,
