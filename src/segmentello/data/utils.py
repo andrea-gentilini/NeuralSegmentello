@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 import numpy as np
 from scipy.spatial.distance import directed_hausdorff
 
@@ -113,7 +113,7 @@ def compute_pixel_accuracy(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> 
 
 def extract_boundary(mask: torch.Tensor, kernel_size: int = 3) -> torch.Tensor:
     padding = kernel_size // 2
-    eroded = F.max_pool2d(1 - mask.unsqueeze(0).unsqueeze(0), kernel_size, stride=1, padding=padding)
+    eroded = F.max_pool2d(1 - mask.unsqueeze(0), kernel_size, stride=1, padding=padding)
     boundary = mask - (1 - eroded.squeeze(0).squeeze(0))
     return (boundary > 0).float()
 

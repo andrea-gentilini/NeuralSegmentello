@@ -1,8 +1,8 @@
 from data.config import *
 from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
-from segmentello.u_net_res_attention import Coarse2FineUNet
-from segmentello.u_net import Coarse2FineTiny
-from segmentello.u_net_residual import Coarse2FineTinyRes
+from u_net_res_attention import Coarse2FineUNet
+from u_net import Coarse2FineTiny
+from u_net_residual import Coarse2FineTinyRes
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
@@ -89,7 +89,7 @@ def main() -> None:
     #     learnable_weights=False,
     # )
     
-    model = Coarse2FineTiny(losses=["bce","boundary"])
+    model = Coarse2FineTiny(losses=["bce", "dice"], loss_weights=[.5, .5])
     # model = Coarse2FineTinyRes()
     trainer.fit(
         model,

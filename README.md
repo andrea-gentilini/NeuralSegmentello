@@ -1,7 +1,7 @@
 # TODO
 ## Training
 - `bce + dice`
-- [ ] u_net_tiny        features=[16,32]
+- [ ] u_net_tiny        features=[16,32] (in progress...)
 - [ ] u_net_tiny_res    features=[16,32]
 
 - `bce + dice`
