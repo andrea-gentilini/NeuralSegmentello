@@ -1,7 +1,7 @@
 from data.config import *
-from u_net_training import CoarseMaskDataset, Coarse2FineUNet
-from u_net_tiny import Coarse2FineTiny
-from u_net_tiny_res import Coarse2FineTinyRes
+from dataset import CoarseMaskDataset
+from segmentello.u_net import Coarse2FineTiny
+from segmentello.u_net_residual import Coarse2FineTinyRes
 import torch
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -99,12 +99,17 @@ def main() -> None:
     # model_path: str = "lightning_logs/version_1/checkpoints/epoch=9-step=490.ckpt"
     # model_path: str = "checkpoints/erode_13052025/best-checkpoint.ckpt"
     # model_path: str = "checkpoints/erode_14052025/best-checkpoint.ckpt"
-    model_path: str = "checkpoints/u_net_tiny/best-checkpoint.ckpt"
-    model_path: str = "checkpoints/u_net_tiny_res_fix/best-checkpoint.ckpt"
+    # model_path: str = "checkpoints/u_net_tiny/best-checkpoint.ckpt"
+    # model_path: str = "checkpoints/u_net_tiny_res_fix/best-checkpoint.ckpt"
+    # model_path: str = "checkpoints/u_net_tiny_res_16-128_erode1000_15052025/best-checkpoint.ckpt"
+    # model_path: str = "checkpoints/u_net_tiny_16-128_erode1000_15052025/best-checkpoint.ckpt"
+    model_path: str = "checkpoints/u_net_tiny_dice_bound/best-checkpoint.ckpt"
+
     # model = Coarse2FineUNet.load_from_checkpoint(model_path)
     # model = Coarse2FineUNetSmall.load_from_checkpoint(model_path)
     # model = Coarse2FineTiny.load_from_checkpoint(model_path)
-    model = Coarse2FineTinyRes.load_from_checkpoint(model_path)
+    # model = Coarse2FineTinyRes.load_from_checkpoint(model_path)
+    model = Coarse2FineTiny.load_from_checkpoint(model_path)
 
     # sample = dataset_gray[0]
     # item = sample[0]
@@ -117,8 +122,11 @@ def main() -> None:
         # predicted = model(item.unsqueeze(0))
 
     plot_result(dataset_gray, model, num_samples=5)
-    evaluate_checkpoint("checkpoints/u_net_tiny_res_fix")
+    # evaluate_checkpoint("checkpoints/u_net_tiny_res_fix")
     # evaluate_checkpoint("checkpoints/u_net_tiny")
+    # evaluate_checkpoint("checkpoints/u_net_tiny_res_16-128_erode1000_15052025")
+    # evaluate_checkpoint("checkpoints/u_net_tiny_16-128_erode1000_15052025")
+    evaluate_checkpoint("checkpoints/u_net_tiny_dice_bound")
 
 if __name__ == "__main__":
     main()

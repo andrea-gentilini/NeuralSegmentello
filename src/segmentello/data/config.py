@@ -2,7 +2,7 @@ import os
 
 # training config
 BATCH_SIZE: int = 1
-LR: float = 1e-4
+LR: float = 1e-3
 NUM_WORKERS: int = 2
 EPOCHS: int = 50
 SEED: int = 42

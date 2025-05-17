@@ -1,8 +1,8 @@
 from data.config import *
 from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
-from u_net_attention_model import Coarse2FineUNet
-from u_net_tiny import Coarse2FineTiny
-from u_net_tiny_res import Coarse2FineTinyRes
+from segmentello.u_net_res_attention import Coarse2FineUNet
+from segmentello.u_net import Coarse2FineTiny
+from segmentello.u_net_residual import Coarse2FineTinyRes
 from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
@@ -43,7 +43,7 @@ def main() -> None:
     )
 
     checkpoint_callback = ModelCheckpoint(
-        dirpath=MODEL_CHECKPOINT_DIR,
+        # dirpath=MODEL_CHECKPOINT_DIR,
         filename="best-checkpoint",
         save_top_k=SAVE_TOP_K,
         save_last=True,  # save last ckpt to resume training
@@ -89,7 +89,7 @@ def main() -> None:
     #     learnable_weights=False,
     # )
     
-    model = Coarse2FineTiny()
+    model = Coarse2FineTiny(losses=["bce","boundary"])
     # model = Coarse2FineTinyRes()
     trainer.fit(
         model,

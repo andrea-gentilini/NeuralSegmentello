@@ -1,23 +1,17 @@
+from data.config import *
+from data.utils import (
+    DoubleConv,
+    DiceLoss,
+    SobelLoss,
+    compute_iou,
+    compute_boundary_iou,
+    compute_pixel_accuracy,
+    compute_hausdorff_distance,
+)
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from u_net_attention_model import compute_iou, SobelLoss
-
-class DoubleConv(nn.Module):
-    def __init__(self, in_channels, out_channels, num_groups=8):
-        super().__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, 3, padding=1),
-            nn.GroupNorm(num_groups, out_channels),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, 3, padding=1),
-            nn.GroupNorm(num_groups, out_channels),
-            nn.ReLU(inplace=True),
-        )
-
-    def forward(self, x):
-        return self.conv(x)
 
 
 class UNetMini(nn.Module):
@@ -63,17 +57,14 @@ class UNetMini(nn.Module):
         return self.final_conv(x)
 
 
-class DiceLoss(nn.Module):
-    def forward(self, inputs, targets, smooth=1.):
-        inputs = torch.sigmoid(inputs)
-        inputs = inputs.view(-1)
-        targets = targets.view(-1)
-        intersection = (inputs * targets).sum()
-        return 1 - ((2.*intersection + smooth) / (inputs.sum() + targets.sum() + smooth))
-
-
 class Coarse2FineTinyRes(pl.LightningModule):
-    def __init__(self, lr=1e-3, features=[16, 32], losses=["bce", "dice"]):
+    def __init__(
+        self, 
+        lr: float = LR, 
+        features: list[int] = [16, 32], 
+        losses: list[str] = ["bce", "dice"],
+        loss_weights: list[int | float] | None = None,
+    ):
         """
         losses: {"bce","dice","boundary"}
         """
@@ -84,9 +75,8 @@ class Coarse2FineTinyRes(pl.LightningModule):
             "boundary": SobelLoss(),
         }
         self.model = UNetMini(in_channels=3, out_channels=1, features=features)
-        # self.bce = nn.BCEWithLogitsLoss()
-        # self.dice = DiceLoss()
         self.losses = [loss_to_class[loss] for loss in losses]
+        self.default_weights = loss_weights or [1/len(losses)]*(len(losses))
         self.lr = lr
 
     def forward(self, x):
@@ -95,9 +85,9 @@ class Coarse2FineTinyRes(pl.LightningModule):
         refined = coarse_mask + residual
         # return torch.sigmoid(refined)
         return refined
-    
+
     def compute_loss(self, preds, y):
-        return sum([loss(preds, y) for loss in self.losses])
+        return sum([w*loss(preds, y) for w,loss in zip(self.default_weights, self.losses)])
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -114,15 +104,40 @@ class Coarse2FineTinyRes(pl.LightningModule):
         x = x.to(self.device)
         y = y.to(self.device)
         preds = self(x)
-        # loss = self.bce(preds, y) + self.dice(preds, y)
+
+        # Loss (can be BCE + Dice or any custom combination)
         loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
-        # Compute IoU for the batch
-        preds_class = (preds > 0.5).float()  # Convert predictions to binary values
-        ious = [compute_iou(preds_class[i], y[i]) for i in range(x.size(0))]
-        batch_iou = torch.stack(ious).mean()  # Compute mean IoU for the batch
-        self.log("val_iou", batch_iou, prog_bar=True)
+        # Binarize predictions
+        preds_class = (preds > 0.5).float()
+
+        # Compute metrics per sample
+        ious = []
+        accuracies = []
+        boundary_ious = []
+        hausdorff_dists = []
+
+        for i in range(x.size(0)):
+            pred_i = preds_class[i]
+            true_i = y[i]
+
+            ious.append(compute_iou(pred_i, true_i))
+            accuracies.append(compute_pixel_accuracy(pred_i, true_i))
+            boundary_ious.append(compute_boundary_iou(pred_i, true_i))
+            hausdorff_dists.append(compute_hausdorff_distance(pred_i, true_i))
+
+        # Aggregate metrics
+        mean_iou = torch.stack(ious).mean()
+        mean_acc = torch.stack(accuracies).mean()
+        mean_biou = torch.stack(boundary_ious).mean()
+        mean_hd = torch.stack(hausdorff_dists).mean()
+
+        # Log metrics
+        self.log("val_iou", mean_iou, prog_bar=True)
+        self.log("val_accuracy", mean_acc, prog_bar=True)
+        self.log("val_boundary_iou", mean_biou, prog_bar=False)
+        self.log("val_hausdorff", mean_hd, prog_bar=False)
 
         return loss
 
