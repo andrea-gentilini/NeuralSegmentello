@@ -6,8 +6,8 @@
 
 
 - `bce + dice`
-- [ ] u_net_tiny        features=[16,32,64,128]
-- [ ] u_net_tiny_res    features=[16,32,64,128]
+- [x] u_net_tiny        features=[16,32,64,128] (I)
+- [x] u_net_tiny_res    features=[16,32,64,128] (I)
 - `bce + dice + boundary`
 - [ ] u_net_tiny        features=[16,32,64,128] (in progress...)
 - [ ] u_net_tiny_res    features=[16,32,64,128]
