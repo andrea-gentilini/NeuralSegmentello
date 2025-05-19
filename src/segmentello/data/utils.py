@@ -49,7 +49,7 @@ class SobelLoss(nn.Module):
     def forward(self, pred, target):
         pred = torch.sigmoid(pred)
         target = target.float()
-
+        
         # Ensure Sobel filters are on the same device as pred
         sobel_x = self.sobel_x.to(pred.device)
         sobel_y = self.sobel_y.to(pred.device)
