@@ -50,15 +50,20 @@ class SobelLoss(nn.Module):
         pred = torch.sigmoid(pred)
         target = target.float()
 
-        grad_pred_x = F.conv2d(pred, self.sobel_x, padding=1)
-        grad_pred_y = F.conv2d(pred, self.sobel_y, padding=1)
-        grad_target_x = F.conv2d(target, self.sobel_x, padding=1)
-        grad_target_y = F.conv2d(target, self.sobel_y, padding=1)
+        # Ensure Sobel filters are on the same device as pred
+        sobel_x = self.sobel_x.to(pred.device)
+        sobel_y = self.sobel_y.to(pred.device)
+
+        grad_pred_x = F.conv2d(pred, sobel_x, padding=1)
+        grad_pred_y = F.conv2d(pred, sobel_y, padding=1)
+        grad_target_x = F.conv2d(target, sobel_x, padding=1)
+        grad_target_y = F.conv2d(target, sobel_y, padding=1)
 
         grad_pred = torch.sqrt(grad_pred_x**2 + grad_pred_y**2 + 1e-8)
         grad_target = torch.sqrt(grad_target_x**2 + grad_target_y**2 + 1e-8)
 
         return F.mse_loss(grad_pred, grad_target)
+
     
 
 class AttentionBlock(nn.Module):

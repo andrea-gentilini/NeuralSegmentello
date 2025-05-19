@@ -89,8 +89,8 @@ def main() -> None:
     #     learnable_weights=False,
     # )
     
-    model = Coarse2FineTiny(losses=["bce", "dice"], loss_weights=[.5, .5])
-    # model = Coarse2FineTinyRes()
+    # model = Coarse2FineTiny(losses=["bce", "dice"], loss_weights=[.5, .5])
+    model = Coarse2FineTinyRes(features = [16, 32, 64, 128], losses = ["bce", "dice", "boundary"], loss_weights = [.4, .4, .2])
     trainer.fit(
         model,
         train_dataloaders=train_loader,
