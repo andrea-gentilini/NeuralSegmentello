@@ -59,8 +59,13 @@ class UNet(nn.Module):
 
 
 class Coarse2FineUNet(pl.LightningModule):
-    def __init__(self, in_channels=3, out_channels=1, lr=LR,
-                 loss_weights=None, losses=["bce", "dice"]):
+    def __init__(
+        self, 
+        in_channels=3, 
+        out_channels=1, 
+        lr=LR,
+        loss_weights=None, losses=["bce", "dice"],
+    ):
         """
         losses: {"bce","dice","boundary"}
         """
@@ -71,10 +76,7 @@ class Coarse2FineUNet(pl.LightningModule):
         }
         super().__init__()
         self.model = UNet(in_channels=in_channels, out_channels=out_channels)
-
-        # Loss functions
         self.losses = [loss_to_class[loss] for loss in losses]
-        # Loss weights
         self.default_weights = loss_weights or [1/len(losses)]*(len(losses))
         self.lr = lr
 
@@ -88,11 +90,8 @@ class Coarse2FineUNet(pl.LightningModule):
         x, y = batch  # x: [B, 3, H, W], y: [B, 1, H, W]
         x = x.to(self.device)
         y = y.to(self.device)
-        
-        coarse = x[:, 0:1, :, :]  # [B, 1, H, W]
-        logits = self(x)          # [B, 1, H, W]
-        
-        loss = self.compute_loss(logits, y, coarse)
+        logits = self(x)  # [B, 1, H, W]
+        loss = self.compute_loss(logits, y)
         self.log("train_loss", loss, prog_bar=True)
         return loss
 
@@ -102,15 +101,10 @@ class Coarse2FineUNet(pl.LightningModule):
         x = x.to(self.device)
         y = y.to(self.device)
         preds = self(x)
-
-        # Loss (can be BCE + Dice or any custom combination)
         loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
-        # Binarize predictions
         preds_class = (preds > 0.5).float()
-
-        # Compute metrics per sample
         ious = []
         accuracies = []
         boundary_ious = []
@@ -125,13 +119,11 @@ class Coarse2FineUNet(pl.LightningModule):
             boundary_ious.append(compute_boundary_iou(pred_i, true_i))
             hausdorff_dists.append(compute_hausdorff_distance(pred_i, true_i))
 
-        # Aggregate metrics
         mean_iou = torch.stack(ious).mean()
         mean_acc = torch.stack(accuracies).mean()
         mean_biou = torch.stack(boundary_ious).mean()
         mean_hd = torch.stack(hausdorff_dists).mean()
 
-        # Log metrics
         self.log("val_iou", mean_iou, prog_bar=True)
         self.log("val_accuracy", mean_acc, prog_bar=True)
         self.log("val_boundary_iou", mean_biou, prog_bar=False)

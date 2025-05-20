@@ -104,15 +104,10 @@ class Coarse2FineTinyRes(pl.LightningModule):
         x = x.to(self.device)
         y = y.to(self.device)
         preds = self(x)
-
-        # Loss (can be BCE + Dice or any custom combination)
         loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
-        # Binarize predictions
         preds_class = (preds > 0.5).float()
-
-        # Compute metrics per sample
         ious = []
         accuracies = []
         boundary_ious = []
@@ -127,13 +122,11 @@ class Coarse2FineTinyRes(pl.LightningModule):
             boundary_ious.append(compute_boundary_iou(pred_i, true_i))
             hausdorff_dists.append(compute_hausdorff_distance(pred_i, true_i))
 
-        # Aggregate metrics
         mean_iou = torch.stack(ious).mean()
         mean_acc = torch.stack(accuracies).mean()
         mean_biou = torch.stack(boundary_ious).mean()
         mean_hd = torch.stack(hausdorff_dists).mean()
 
-        # Log metrics
         self.log("val_iou", mean_iou, prog_bar=True)
         self.log("val_accuracy", mean_acc, prog_bar=True)
         self.log("val_boundary_iou", mean_biou, prog_bar=False)
