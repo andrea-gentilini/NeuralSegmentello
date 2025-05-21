@@ -90,9 +90,9 @@ def main() -> None:
     # )
     
     model = Coarse2FineTinyRes(
-        losses=["bce", "dice"], 
-        features=[16, 32, 64, 128],
-        loss_weights=[0.5, 0.5],
+        losses=["bce", "dice", "boundary"], 
+        features=[32, 64, 128, 256],
+        loss_weights=[0.4, 0.4, 0.2],
     )
     trainer.fit(
         model,
