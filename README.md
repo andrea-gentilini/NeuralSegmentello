@@ -15,4 +15,4 @@
 
 - `bce + dice` o `bce + dice + boundary`
 - [x] u_net_tiny_res    features=[32,64,128,256]
-- [] u_net_attention   features=[32,64,128,256] (in progress...)
+- [ ] u_net_attention   features=[32,64,128,256] (in progress...)
