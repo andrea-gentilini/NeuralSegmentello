@@ -1,9 +1,14 @@
 [project]
 name = "neuralsegmentello"
 version = "0.1.0"
-description = "A short description"
-authors = [{name = "Your Name", email = "you@example.com"}]
-requires-python = "==3.12"
+description = ""
+authors = [
+    {name = "Andrea Gentilini", email = ""},
+    {name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com"},
+    {name = "Leo Petrarca", email = ""},
+    {name = "Michele Magrini", email = ""},
+]
+requires-python = ">=3.12"
 
 dependencies = [
     "matplotlib==3.10.3",
