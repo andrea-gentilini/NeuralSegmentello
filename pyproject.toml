@@ -3,7 +3,7 @@ name = "neuralsegmentello"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Andrea Gentilini", email = ""},
+    {name = "Andrea Gentilini", email = "agentilini99@gmail.com"},
     {name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com"},
     {name = "Leo Petrarca", email = ""},
     {name = "Michele Magrini", email = ""},
