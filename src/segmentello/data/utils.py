@@ -1,7 +1,7 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 from scipy.spatial.distance import directed_hausdorff
 
 
@@ -20,7 +20,7 @@ class DoubleConv(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-    
+
 
 class DiceLoss(nn.Module):
     def forward(self, inputs, targets, smooth=1):
@@ -28,20 +28,24 @@ class DiceLoss(nn.Module):
         inputs = inputs.view(-1)
         targets = targets.view(-1)
         intersection = (inputs * targets).sum()
-        dice = (2.*intersection + smooth) / (inputs.sum() + targets.sum() + smooth)
+        dice = (2.0 * intersection + smooth) / (inputs.sum() + targets.sum() + smooth)
         return 1 - dice
 
 
 class SobelLoss(nn.Module):
     def __init__(self):
         super().__init__()
-        sobel_x = torch.tensor([[-1, 0, 1],
-                                [-2, 0, 2],
-                                [-1, 0, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+        sobel_x = (
+            torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32)
+            .unsqueeze(0)
+            .unsqueeze(0)
+        )
 
-        sobel_y = torch.tensor([[-1, -2, -1],
-                                [0, 0, 0],
-                                [1, 2, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+        sobel_y = (
+            torch.tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32)
+            .unsqueeze(0)
+            .unsqueeze(0)
+        )
 
         self.register_buffer("sobel_x", sobel_x)
         self.register_buffer("sobel_y", sobel_y)
@@ -49,7 +53,7 @@ class SobelLoss(nn.Module):
     def forward(self, pred, target):
         pred = torch.sigmoid(pred)
         target = target.float()
-        
+
         # Ensure Sobel filters are on the same device as pred
         sobel_x = self.sobel_x.to(pred.device)
         sobel_y = self.sobel_y.to(pred.device)
@@ -64,25 +68,24 @@ class SobelLoss(nn.Module):
 
         return F.mse_loss(grad_pred, grad_target)
 
-    
 
 class AttentionBlock(nn.Module):
     def __init__(self, g_channels, x_channels, intermediate_channels):
         super().__init__()
         self.W_g = nn.Sequential(
             nn.Conv2d(g_channels, intermediate_channels, kernel_size=1),
-            nn.BatchNorm2d(intermediate_channels)
+            nn.BatchNorm2d(intermediate_channels),
         )
 
         self.W_x = nn.Sequential(
             nn.Conv2d(x_channels, intermediate_channels, kernel_size=1),
-            nn.BatchNorm2d(intermediate_channels)
+            nn.BatchNorm2d(intermediate_channels),
         )
 
         self.psi = nn.Sequential(
             nn.Conv2d(intermediate_channels, 1, kernel_size=1),
             nn.BatchNorm2d(1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
         self.relu = nn.ReLU(inplace=True)
@@ -93,12 +96,14 @@ class AttentionBlock(nn.Module):
 
         # Align shapes explicitly
         if g1.shape[2:] != x1.shape[2:]:
-            g1 = F.interpolate(g1, size=x1.shape[2:], mode='bilinear', align_corners=False)
+            g1 = F.interpolate(
+                g1, size=x1.shape[2:], mode="bilinear", align_corners=False
+            )
 
         psi = self.relu(g1 + x1)
         psi = self.psi(psi)
         return x * psi
-    
+
 
 # Metrics
 def compute_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
@@ -106,15 +111,25 @@ def compute_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tenso
     true_mask = (true_mask > 0).float()
     intersection = (pred_mask * true_mask).sum()
     union = pred_mask.sum() + true_mask.sum() - intersection
-    iou = intersection / union if union > 0 else torch.tensor(1.0) if intersection == 0 else torch.tensor(0.0)
+    iou = (
+        intersection / union
+        if union > 0
+        else torch.tensor(1.0)
+        if intersection == 0
+        else torch.tensor(0.0)
+    )
     return iou
 
-def compute_pixel_accuracy(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
+
+def compute_pixel_accuracy(
+    pred_mask: torch.Tensor, true_mask: torch.Tensor
+) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
     correct = (pred_mask == true_mask).float().sum()
     total = true_mask.numel()
     return correct / total
+
 
 def extract_boundary(mask: torch.Tensor, kernel_size: int = 3) -> torch.Tensor:
     padding = kernel_size // 2
@@ -122,7 +137,10 @@ def extract_boundary(mask: torch.Tensor, kernel_size: int = 3) -> torch.Tensor:
     boundary = mask - (1 - eroded.squeeze(0).squeeze(0))
     return (boundary > 0).float()
 
-def compute_boundary_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor, kernel_size: int = 3) -> torch.Tensor:
+
+def compute_boundary_iou(
+    pred_mask: torch.Tensor, true_mask: torch.Tensor, kernel_size: int = 3
+) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
 
@@ -131,13 +149,23 @@ def compute_boundary_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor, kerne
 
     intersection = (pred_boundary * true_boundary).sum()
     union = pred_boundary.sum() + true_boundary.sum() - intersection
-    iou = intersection / union if union > 0 else torch.tensor(1.0) if intersection == 0 else torch.tensor(0.0)
+    iou = (
+        intersection / union
+        if union > 0
+        else torch.tensor(1.0)
+        if intersection == 0
+        else torch.tensor(0.0)
+    )
     return iou
+
 
 def mask_to_numpy_coords(mask: torch.Tensor) -> np.ndarray:
     return mask.nonzero(as_tuple=False).cpu().numpy()
 
-def compute_hausdorff_distance(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
+
+def compute_hausdorff_distance(
+    pred_mask: torch.Tensor, true_mask: torch.Tensor
+) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
 
@@ -147,7 +175,7 @@ def compute_hausdorff_distance(pred_mask: torch.Tensor, true_mask: torch.Tensor)
     if pred_coords.size == 0 and true_coords.size == 0:
         return torch.tensor(0.0)  # no structure in either
     if pred_coords.size == 0 or true_coords.size == 0:
-        return torch.tensor(float('inf'))  # one is empty
+        return torch.tensor(float("inf"))  # one is empty
 
     hd_forward = directed_hausdorff(pred_coords, true_coords)[0]
     hd_backward = directed_hausdorff(true_coords, pred_coords)[0]

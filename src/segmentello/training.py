@@ -1,43 +1,58 @@
-from data.config import *
-from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
-from u_net_res_attention import Coarse2FineUNet
-from u_net import Coarse2FineTiny
-from u_net_residual import Coarse2FineTinyRes
-from torch.utils.data import DataLoader, random_split
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 import torch
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+from torch.utils.data import DataLoader, random_split
+
+from data.config import (
+    BATCH_SIZE,
+    DATA_ADAPTATION_DIR,
+    EPOCHS,
+    IMG_GRADIENT,
+    IMG_MODE,
+    MONITOR_METRIC,
+    NUM_WORKERS,
+    PATIENCE,
+    SAVE_TOP_K,
+    SEED,
+    TRAIN_VALID_SPLIT,
+    TRANSFORM_MODE,
+)
+from dataset import CoarseMaskDataset, SingleSampleDataset, collate_fn
+from u_net import Coarse2FineTiny
+from u_net_res_attention import Coarse2FineUNetAttention
+from u_net_residual import Coarse2FineTinyRes
+
 
 def main() -> None:
     pl.seed_everything(SEED)
 
     full_dataset = CoarseMaskDataset(
-        DATA_ADAPTATION_DIR, 
-        transform_type=TRANSFORM_MODE, 
+        DATA_ADAPTATION_DIR,
+        transform_type=TRANSFORM_MODE,
         image_gradient=IMG_GRADIENT,
-        mode=IMG_MODE
+        mode=IMG_MODE,
     )
 
     total_len = len(full_dataset)
-    val_len = int(total_len * TRAIN_VALID_SPLIT)  # e.g., 10%
+    val_len = int(total_len * TRAIN_VALID_SPLIT)
     train_len = total_len - val_len
     train_dataset, val_dataset = random_split(
-        full_dataset, 
-        [train_len, val_len], 
-        generator=torch.Generator().manual_seed(SEED)
+        full_dataset,
+        [train_len, val_len],
+        generator=torch.Generator().manual_seed(SEED),
     )
 
     train_loader = DataLoader(
-        train_dataset, 
-        batch_size=BATCH_SIZE, 
-        shuffle=True, 
+        train_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
         num_workers=NUM_WORKERS,
         collate_fn=collate_fn,
     )
     val_loader = DataLoader(
-        val_dataset, 
-        batch_size=BATCH_SIZE, 
-        shuffle=False, 
+        val_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
         num_workers=NUM_WORKERS,
         collate_fn=collate_fn,
     )
@@ -52,10 +67,7 @@ def main() -> None:
         mode="min",
     )
     early_stop_callback = EarlyStopping(
-        monitor=MONITOR_METRIC,
-        patience=EPOCHS // 10,
-        verbose=True,
-        mode="min"
+        monitor=MONITOR_METRIC, patience=PATIENCE, verbose=True, mode="min"
     )
     trainer = pl.Trainer(
         max_epochs=EPOCHS,
@@ -63,34 +75,17 @@ def main() -> None:
         log_every_n_steps=5,
     )
 
-
-    # 1 img dataset
-    
+    # # 1 img dataset
     # dumb_dataset = SingleSampleDataset(full_dataset[0])
     # dumb_dl = DataLoader(
-    #     dumb_dataset, 
-    #     batch_size=1, 
-    #     shuffle=False, 
+    #     dumb_dataset,
+    #     batch_size=1,
+    #     shuffle=False,
     #     num_workers=NUM_WORKERS
     # )
 
-    # model = Coarse2FineUNet(
-    #     in_channels=IN_CHANNELS,
-    #     lr=LR,
-    #     starting_loss_weights=STARTING_LOSS_WEIGHTS,
-    #     refinement_penalty=REFINEMENT_PENALTY,
-    #     learnable_weights=False,
-    # )
-    # model = Coarse2FineUNetSmall(
-    #     in_channels=IN_CHANNELS,
-    #     lr=LR,
-    #     starting_loss_weights=STARTING_LOSS_WEIGHTS,
-    #     refinement_penalty=REFINEMENT_PENALTY,
-    #     learnable_weights=False,
-    # )
-    
     model = Coarse2FineTinyRes(
-        losses=["bce", "dice", "boundary"], 
+        losses=["bce", "dice", "boundary"],
         features=[32, 64, 128, 256],
         loss_weights=[0.4, 0.4, 0.2],
     )
@@ -107,6 +102,7 @@ def main() -> None:
     #     model,
     #     train_dataloaders=dumb_dl
     # )
+
 
 if __name__ == "__main__":
     main()

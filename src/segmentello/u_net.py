@@ -1,17 +1,18 @@
-from data.config import *
-from data.utils import (
-    DoubleConv,
-    DiceLoss,
-    SobelLoss,
-    compute_iou,
-    compute_boundary_iou,
-    compute_hausdorff_distance,
-    compute_pixel_accuracy,
-)
+import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
+
+from data.config import LR
+from data.utils import (
+    DiceLoss,
+    DoubleConv,
+    SobelLoss,
+    compute_boundary_iou,
+    compute_hausdorff_distance,
+    compute_iou,
+    compute_pixel_accuracy,
+)
 
 
 class UNetMini(nn.Module):
@@ -27,12 +28,12 @@ class UNetMini(nn.Module):
             in_channels = feature
 
         # Bottleneck
-        self.bottleneck = DoubleConv(features[-1], features[-1]*2)
+        self.bottleneck = DoubleConv(features[-1], features[-1] * 2)
 
         # Upsampling
         for feature in reversed(features):
-            self.ups.append(nn.ConvTranspose2d(feature*2, feature, 2, stride=2))
-            self.ups.append(DoubleConv(feature*2, feature))
+            self.ups.append(nn.ConvTranspose2d(feature * 2, feature, 2, stride=2))
+            self.ups.append(DoubleConv(feature * 2, feature))
 
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
@@ -48,43 +49,45 @@ class UNetMini(nn.Module):
 
         for idx in range(0, len(self.ups), 2):
             x = self.ups[idx](x)
-            skip = skips[idx//2]
+            skip = skips[idx // 2]
             if x.shape != skip.shape:
                 x = F.interpolate(x, size=skip.shape[2:])
             x = torch.cat((skip, x), dim=1)
-            x = self.ups[idx+1](x)
+            x = self.ups[idx + 1](x)
 
         return self.final_conv(x)
 
 
 class Coarse2FineTiny(pl.LightningModule):
     def __init__(
-        self, 
-        lr: float = LR, 
-        features: list[int] = [16, 32], 
+        self,
+        lr: float = LR,
+        features: list[int] = [16, 32],
         losses: list[str] = ["bce", "dice"],
         loss_weights: list[int | float] | None = None,
     ):
         """
         losses: {"bce","dice","boundary"}
         """
+        super().__init__()
         loss_to_class = {
             "bce": nn.BCEWithLogitsLoss(),
             "dice": DiceLoss(),
             "boundary": SobelLoss(),
         }
-        super().__init__()
         self.model = UNetMini(in_channels=3, out_channels=1, features=features)
-        
+
         self.losses = [loss_to_class[loss] for loss in losses]
-        self.default_weights = loss_weights or [1/len(losses)]*(len(losses))
+        self.default_weights = loss_weights or [1 / len(losses)] * (len(losses))
         self.lr = lr
 
     def forward(self, x):
         return self.model(x)
 
     def compute_loss(self, preds, y):
-        return sum([w*loss(preds, y) for w,loss in zip(self.default_weights, self.losses)])
+        return sum(
+            [w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)]
+        )
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -130,7 +133,6 @@ class Coarse2FineTiny(pl.LightningModule):
         self.log("val_hausdorff", mean_hd, prog_bar=False)
 
         return loss
-
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)

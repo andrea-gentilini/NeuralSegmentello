@@ -1,19 +1,19 @@
-from data.config import *
-from data.utils import (
-    DoubleConv, 
-    SobelLoss, 
-    DiceLoss, 
-    AttentionBlock,
-    compute_iou,
-    compute_boundary_iou,
-    compute_hausdorff_distance,
-    compute_pixel_accuracy,
-)
+import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
 
+from data.config import LR
+from data.utils import (
+    AttentionBlock,
+    DiceLoss,
+    DoubleConv,
+    SobelLoss,
+    compute_boundary_iou,
+    compute_hausdorff_distance,
+    compute_iou,
+    compute_pixel_accuracy,
+)
 
 
 class UNet(nn.Module):
@@ -29,11 +29,17 @@ class UNet(nn.Module):
             in_channels = feature
 
         for feature in reversed(features):
-            self.ups.append(nn.ConvTranspose2d(feature*2, feature, 2, 2))
-            self.ups.append(DoubleConv(feature*2, feature))
-            self.attentions.append(AttentionBlock(g_channels=feature, x_channels=feature, intermediate_channels=feature//2))
+            self.ups.append(nn.ConvTranspose2d(feature * 2, feature, 2, 2))
+            self.ups.append(DoubleConv(feature * 2, feature))
+            self.attentions.append(
+                AttentionBlock(
+                    g_channels=feature,
+                    x_channels=feature,
+                    intermediate_channels=feature // 2,
+                )
+            )
 
-        self.bottleneck = DoubleConv(features[-1], features[-1]*2)
+        self.bottleneck = DoubleConv(features[-1], features[-1] * 2)
         self.final_conv = nn.Conv2d(features[0], out_channels, 1)
 
     def forward(self, x):
@@ -48,43 +54,47 @@ class UNet(nn.Module):
 
         for i in range(0, len(self.ups), 2):
             x = self.ups[i](x)  # Upsample first
-            attn = self.attentions[i//2](g=x, x=skip[i//2])  # Apply attention AFTER upsample
+            attn = self.attentions[i // 2](
+                g=x, x=skip[i // 2]
+            )  # Apply attention AFTER upsample
             if x.shape != attn.shape:
                 x = F.interpolate(x, size=attn.shape[2:])
             x = torch.cat([attn, x], dim=1)
-            x = self.ups[i+1](x)
-
+            x = self.ups[i + 1](x)
 
         return self.final_conv(x)
 
 
-class Coarse2FineUNet(pl.LightningModule):
+class Coarse2FineUNetAttention(pl.LightningModule):
     def __init__(
-        self, 
-        in_channels=3, 
-        out_channels=1, 
+        self,
+        in_channels=3,
+        out_channels=1,
         lr=LR,
-        loss_weights=None, losses=["bce", "dice"],
+        loss_weights=None,
+        losses=["bce", "dice"],
     ):
         """
         losses: {"bce","dice","boundary"}
         """
+        super().__init__()
         loss_to_class = {
             "bce": nn.BCEWithLogitsLoss(),
             "dice": DiceLoss(),
             "boundary": SobelLoss(),
         }
-        super().__init__()
         self.model = UNet(in_channels=in_channels, out_channels=out_channels)
         self.losses = [loss_to_class[loss] for loss in losses]
-        self.default_weights = loss_weights or [1/len(losses)]*(len(losses))
+        self.default_weights = loss_weights or [1 / len(losses)] * (len(losses))
         self.lr = lr
 
     def forward(self, x):
         return self.model(x)
 
     def compute_loss(self, preds, y):
-        return sum([w*loss(preds, y) for w,loss in zip(self.default_weights, self.losses)])
+        return sum(
+            [w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)]
+        )
 
     def training_step(self, batch, batch_idx):
         x, y = batch  # x: [B, 3, H, W], y: [B, 1, H, W]
@@ -94,7 +104,6 @@ class Coarse2FineUNet(pl.LightningModule):
         loss = self.compute_loss(logits, y)
         self.log("train_loss", loss, prog_bar=True)
         return loss
-
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
