@@ -20,7 +20,8 @@ dependencies = [
     "torchmetrics==1.7.1",
     "torchvision==0.22.0",
     "scipy==1.15.1",
-    "pandas==2.2.3"
+    "pandas==2.2.3",
+    "ipykernel>=6.29.5",
 ]
 
 
