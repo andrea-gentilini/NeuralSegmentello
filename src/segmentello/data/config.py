@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+
 
 # training config
 BATCH_SIZE: int = 1
@@ -21,4 +22,6 @@ MONITOR_METRIC: str = "val_loss"
 MODEL_CHECKPOINT_DIR: str = "checkpoints"
 
 # dirs
-DATA_ADAPTATION_DIR = os.path.join("COCO_dset_adaptation", "reduced_dset_1000")
+DIR_ROOT: Path = Path(__file__).parent.parent.parent.parent
+DATA_ADAPTATION_DIR: Path = DIR_ROOT / "COCO_dset_adaptation" / "reduced_dset_1000"
+MODELS_DIR: Path = DIR_ROOT / "saved_models"
