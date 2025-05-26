@@ -70,21 +70,21 @@ class SobelLoss(nn.Module):
 
 
 class AttentionBlock(nn.Module):
-    def __init__(self, g_channels, x_channels, intermediate_channels):
+    def __init__(self, g_channels, x_channels, intermediate_channels, num_groups=8):
         super().__init__()
         self.W_g = nn.Sequential(
             nn.Conv2d(g_channels, intermediate_channels, kernel_size=1),
-            nn.BatchNorm2d(intermediate_channels),
+            nn.GroupNorm(num_groups, intermediate_channels),
         )
 
         self.W_x = nn.Sequential(
             nn.Conv2d(x_channels, intermediate_channels, kernel_size=1),
-            nn.BatchNorm2d(intermediate_channels),
+            nn.GroupNorm(num_groups, intermediate_channels),
         )
 
         self.psi = nn.Sequential(
             nn.Conv2d(intermediate_channels, 1, kernel_size=1),
-            nn.BatchNorm2d(1),
+            nn.GroupNorm(num_groups, 1),
             nn.Sigmoid(),
         )
 
