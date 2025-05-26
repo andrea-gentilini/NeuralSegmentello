@@ -73,6 +73,7 @@ class Coarse2FineUNetAttention(pl.LightningModule):
         lr=LR,
         loss_weights=None,
         losses=["bce", "dice"],
+        features=[32, 64, 128, 256]
     ):
         """
         losses: {"bce","dice","boundary"}
@@ -83,7 +84,7 @@ class Coarse2FineUNetAttention(pl.LightningModule):
             "dice": DiceLoss(),
             "boundary": SobelLoss(),
         }
-        self.model = UNet(in_channels=in_channels, out_channels=out_channels)
+        self.model = UNet(in_channels=in_channels, out_channels=out_channels, features=features)
         self.losses = [loss_to_class[loss] for loss in losses]
         self.default_weights = loss_weights or [1 / len(losses)] * (len(losses))
         self.lr = lr

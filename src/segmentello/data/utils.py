@@ -84,7 +84,7 @@ class AttentionBlock(nn.Module):
 
         self.psi = nn.Sequential(
             nn.Conv2d(intermediate_channels, 1, kernel_size=1),
-            nn.GroupNorm(num_groups, 1),
+            nn.GroupNorm(1, 1),  # Changed from num_groups to 1
             nn.Sigmoid(),
         )
 

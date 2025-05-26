@@ -84,7 +84,7 @@ def main() -> None:
     #     num_workers=NUM_WORKERS
     # )
 
-    model = Coarse2FineTinyRes(
+    model = Coarse2FineUNetAttention(
         losses=["bce", "dice", "boundary"],
         features=[32, 64, 128, 256],
         loss_weights=[0.4, 0.4, 0.2],
