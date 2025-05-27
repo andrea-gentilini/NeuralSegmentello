@@ -270,6 +270,80 @@ class CoarseMaskDataset(Dataset):
             input_tensor = torch.cat([coarse_mask, image_tensor], dim=0)
 
         return input_tensor, gt_mask
+    
+
+class SimpleCoarseMaskDataset(Dataset):
+    """
+    Simplified Dataset for test experiments.
+    Expects precomputed numpy arrays for coarse masks, images, and ground truth masks.
+
+    Directory structure:
+        dataset_dir/
+            coarse/input_coarse_mask_{i}.npy
+            image/input_image_{i}.npy
+            gt/ground_truth_mask_{i}.npy
+
+    Args:
+        dataset_dir (str): Root directory containing 'coarse', 'image', and 'gt' subdirectories.
+        mode (str): "gray" or "rgb" for the input image mode.
+        image_gradient (bool): Whether to compute and include image gradient in the input tensor.
+
+    Returns:
+        input_tensor (torch.Tensor): Tensor with structure [coarse_mask, image, (optional) gradient].
+        gt_mask (torch.Tensor): Ground truth mask.
+    """
+
+    def __init__(self, dataset_dir: str, mode: str = "gray", image_gradient: bool = False):
+        self.coarse_dir = os.path.join(dataset_dir, "coarse")
+        self.image_dir = os.path.join(dataset_dir, "image")
+        self.gt_dir = os.path.join(dataset_dir, "gt")
+        self.mode = mode
+        self.image_gradient = image_gradient
+
+        # Extract indices from available files
+        self.file_indices = sorted([
+            int(f.split("_")[-1].split(".")[0])
+            for f in os.listdir(self.coarse_dir)
+            if f.startswith("input_coarse_mask_") and f.endswith(".npy")
+        ])
+
+    def __len__(self):
+        return len(self.file_indices)
+
+    def __getitem__(self, idx):
+        index = self.file_indices[idx]
+
+        # Load data
+        coarse_mask = np.load(os.path.join(self.coarse_dir, f"input_coarse_mask_{index}.npy"))
+        image = np.load(os.path.join(self.image_dir, f"input_image_{index}.npy"))
+        gt_mask = np.load(os.path.join(self.gt_dir, f"ground_truth_mask_{index}.npy"))
+
+        # Convert to tensors
+        coarse_mask_tensor = torch.from_numpy(coarse_mask).unsqueeze(0).float()
+        gt_mask_tensor = torch.from_numpy(gt_mask).unsqueeze(0).float()
+
+        if self.mode == "rgb":
+            image_tensor = torch.from_numpy(image).float().permute(2, 0, 1) / 255.0
+            gray_img = cv2.cvtColor((image * 255).astype(np.uint8), cv2.COLOR_RGB2GRAY) if self.image_gradient else None
+        elif self.mode == "gray":
+            image_tensor = torch.from_numpy(image).unsqueeze(0).float() / 255.0
+            gray_img = (image * 255).astype(np.uint8) if self.image_gradient else None
+        else:
+            raise ValueError("Mode must be 'gray' or 'rgb'")
+
+        # Optional gradient
+        if self.image_gradient and gray_img is not None:
+            grad_x = cv2.Sobel(gray_img, cv2.CV_32F, 1, 0, ksize=3)
+            grad_y = cv2.Sobel(gray_img, cv2.CV_32F, 0, 1, ksize=3)
+            grad_mag = np.sqrt(grad_x**2 + grad_y**2)
+            grad_mag = grad_mag / (grad_mag.max() + 1e-8)
+            grad_tensor = torch.from_numpy(grad_mag).unsqueeze(0).float()
+            input_tensor = torch.cat([coarse_mask_tensor, image_tensor, grad_tensor], dim=0)
+        else:
+            input_tensor = torch.cat([coarse_mask_tensor, image_tensor], dim=0)
+
+        return input_tensor, gt_mask_tensor
+
 
 
 def collate_fn(batch):
