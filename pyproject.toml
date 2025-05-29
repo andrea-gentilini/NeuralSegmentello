@@ -6,7 +6,7 @@ authors = [
     {name = "Andrea Gentilini", email = "agentilini99@gmail.com"},
     {name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com"},
     {name = "Leo Petrarca", email = "leopetrarca6@gmail.com"},
-    {name = "Michele Magrini", email = ""},
+    {name = "Michele Magrini", email = "prova@mail.com"},
 ]
 requires-python = ">=3.12"
 
@@ -23,5 +23,3 @@ dependencies = [
     "pandas==2.2.3",
     "ipykernel>=6.29.5",
 ]
-
-

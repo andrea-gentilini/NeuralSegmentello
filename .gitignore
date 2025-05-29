@@ -22,3 +22,5 @@ plot_samples
 figures
 best_metrics.csv
 worst_metrics.csv
+tiny16-128_bce-dice
+res16-128_bce-dice

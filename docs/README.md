@@ -1,18 +1,32 @@
-# TODO
-## Training
-- `bce + dice`
-- [X] u_net_tiny        features=[16,32] 
-- [X] u_net_tiny_res    features=[16,32] 
+# Neural Segmentello
+
+[***Project Report (PDF)***](./NeuralSegmentello.pdf)
 
 
-- `bce + dice`
-- [x] u_net_tiny        features=[16,32,64,128] (I)
-- [x] u_net_tiny_res    features=[16,32,64,128] (I)
-- `bce + dice + boundary`
-- [x] u_net_tiny        features=[16,32,64,128] 
-- [x] u_net_tiny_res    features=[16,32,64,128]
 
 
-- `bce + dice` o `bce + dice + boundary`
-- [x] u_net_tiny_res    features=[32,64,128,256]
-- [X] u_net_attention   features=[32,64,128,256]
+## Installation
+
+### pip
+You can install dependencies in a virtual environment e.g.:
+```sh
+python -m venv .venv
+
+# then activate the environment according to your os:
+source .venv/bin/activate  # linux
+.venv\Scripts\Activate  # windows
+```
+then you can use `pip` to install dependencies:
+```sh
+pip install -r requirements.txt
+```
+or install the whole project (-e for editable mode)
+```sh
+pip install -e .
+```
+
+### uv
+You can use `uv` to install dependencies: just run the following:
+```sh
+uv sync
+```

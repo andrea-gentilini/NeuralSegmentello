@@ -23,5 +23,5 @@ MODEL_CHECKPOINT_DIR: str = "checkpoints"
 
 # dirs
 DIR_ROOT: Path = Path(__file__).parent.parent.parent.parent
-DATA_ADAPTATION_DIR: Path = DIR_ROOT / "COCO_dset_adaptation" / "reduced_dset_1000"
-MODELS_DIR: Path = DIR_ROOT / "saved_models"
+DATA_ADAPTATION_DIR: Path = DIR_ROOT / "dataset" / "COCO_dset_adaptation" / "reduced_dset_1000"
+MODELS_DIR: Path = DIR_ROOT / "models"
