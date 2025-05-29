@@ -78,7 +78,7 @@ def plot_losses(best_model_metrics: str, worst_model_metrics: str) -> None:
     axes[0].plot(
         best_train_df["step"],
         best_train_df["train_loss_smooth"],
-        label="Train Loss (smoothed)",
+        label="Train Loss",
     )
     axes[0].plot(
         best_valid_df["step"],
@@ -97,7 +97,7 @@ def plot_losses(best_model_metrics: str, worst_model_metrics: str) -> None:
     axes[1].plot(
         worst_train_df["step"],
         worst_train_df["train_loss_smooth"],
-        label="Train Loss (smoothed)",
+        label="Train Loss",
     )
     axes[1].plot(
         worst_valid_df["step"],
