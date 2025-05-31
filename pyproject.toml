@@ -6,7 +6,7 @@ authors = [
     {name = "Andrea Gentilini", email = "agentilini99@gmail.com"},
     {name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com"},
     {name = "Leo Petrarca", email = "leopetrarca6@gmail.com"},
-    {name = "Michele Magrini", email = "prova@mail.com"},
+    {name = "Michele Magrini", email = "magrini.2066963@studenti.uniroma.it"},
 ]
 requires-python = ">=3.12"
 
