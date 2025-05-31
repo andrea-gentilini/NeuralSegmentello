@@ -2,7 +2,7 @@
 
 NeuralSegmentello is a deep learning framework for refining coarse object segmentation masks into high-precision segmentations. The task is performed via U-Net-based architectures, given a rough user-provided binary mask (simulating a brush stroke) and the original image. The system returns a refined mask with accurate object contours.
 
-Check out the full project explanation @ [***Project Report (PDF)***](./NeuralSegmentello.pdf)
+Check out the full project explanation in the [**Project Report (PDF)**](./NeuralSegmentello.pdf).
 
 
 
@@ -10,7 +10,8 @@ Check out the full project explanation @ [***Project Report (PDF)***](./NeuralSe
 # Dependencies Installation
 
 ### Using uv (recommended)
-You can use `uv` to install dependencies: just run the following:
+
+If you have [`uv`](https://docs.astral.sh/uv/) installed, simply run:
 ```sh
 uv sync
 ```
@@ -18,15 +19,24 @@ uv sync
 --------------------------------------------------------------
 
 ### Using pip
-You can install dependencies in a virtual environment e.g.:
+You can also set up a virtual environment manually and install dependencies with pip.
+
+Create a virtual environment:
 ```sh
 python -m venv .venv
-
-# then activate the environment according to your os:
-source .venv/bin/activate  # linux/MacOS
-.venv\Scripts\Activate  # windows
 ```
-then you can use `pip` to install dependencies:
+
+Activate it:
+```sh
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+```
+
+Install dependencies using pip:
+
 ```sh
 pip install -r requirements.txt
 ```
