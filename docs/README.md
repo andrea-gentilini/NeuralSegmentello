@@ -1,4 +1,4 @@
-# Neural Segmentello
+# NeuralSegmentello
 
 NeuralSegmentello is a deep learning framework for refining coarse object segmentation masks into high-precision segmentations. The task is performed via U-Net-based architectures, given a rough user-provided binary mask (simulating a brush stroke) and the original image. The system returns a refined mask with accurate object contours.
 
