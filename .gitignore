@@ -10,7 +10,6 @@ coarse_masks
 lightning_logs
 .vscode
 reduced_dset_*
-checkpoints
 .rsyncignore
 saved_models
 ideas.md
