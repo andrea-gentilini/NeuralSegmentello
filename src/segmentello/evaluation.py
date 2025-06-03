@@ -3,8 +3,9 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
+from pathlib import Path
 
-from data.config import DATA_ADAPTATION_DIR
+from data.config import DIR_REDUCED_DSET
 from dataset import CoarseMaskDataset
 from u_net import Coarse2FineTiny
 from u_net_res_attention import Coarse2FineUNetAttention
@@ -128,8 +129,9 @@ def main() -> None:
     # model = Coarse2FineTiny.load_from_checkpoint(model_path)
 
     # plot_result(dataset_gray, model, num_samples=5)
-
-    plot_losses("best_metrics.csv", "worst_metrics.csv")
+    best_metrics = Path("models/attn32-256_bce-dice-bound/metrics.csv")
+    worst_metrics = Path("models/res16-128_bce-dice/metrics.csv")
+    plot_losses(best_metrics, worst_metrics)
 
 
 if __name__ == "__main__":

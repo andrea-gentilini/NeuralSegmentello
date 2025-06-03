@@ -10,7 +10,6 @@ PATIENCE: int = EPOCHS // 10
 SEED: int = 42
 TRAIN_VALID_SPLIT: float = 0.1
 STARTING_LOSS_WEIGHTS: list[float] = [0.3, 0.3, 0.3]
-ORDER_LOSS_WEIGHTS: list[str] = ["bce", "dice", "boundary", "refine"]
 TRANSFORM_MODE: str = "erode"
 IMG_MODE: str = "gray"
 IMG_GRADIENT: bool = True
@@ -23,5 +22,9 @@ MODEL_CHECKPOINT_DIR: str = "checkpoints"
 
 # dirs
 DIR_ROOT: Path = Path(__file__).parent.parent.parent.parent
-DATA_ADAPTATION_DIR: Path = DIR_ROOT / "dataset" / "COCO_dset_adaptation" / "reduced_dset_1000"
+DIR_REDUCED_DSET: Path = DIR_ROOT / "dataset" / "COCO_dset_adaptation" / "reduced_dset_1000"
 MODELS_DIR: Path = DIR_ROOT / "models"
+DIR_COCO_DSET: Path = DIR_ROOT / "dataset" / "COCO_dataset_2014"
+DIR_COCO_DSET_ADAPTATION: Path = DIR_ROOT / "dataset" / "COCO_dset_adaptation"
+
+REDUCED_DSET_SIZE: int = 1000

@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, random_split
 
 from data.config import (
     BATCH_SIZE,
-    DATA_ADAPTATION_DIR,
+    DIR_REDUCED_DSET,
     EPOCHS,
     IMG_GRADIENT,
     IMG_MODE,
@@ -27,7 +27,7 @@ def main() -> None:
     pl.seed_everything(SEED)
 
     full_dataset = CoarseMaskDataset(
-        DATA_ADAPTATION_DIR,
+        DIR_REDUCED_DSET,
         transform_type=TRANSFORM_MODE,
         image_gradient=IMG_GRADIENT,
         mode=IMG_MODE,

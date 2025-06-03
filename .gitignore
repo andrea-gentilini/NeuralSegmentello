@@ -1,25 +1,8 @@
-pytorch-AdaIN
-COCO_2014_dataset
+COCO_dataset_2014
 .DS_Store
 __pycache__
-scratches
 *venv
-full_dset
-masks
-coarse_masks
 lightning_logs
 .vscode
 reduced_dset_*
 .rsyncignore
-saved_models
-ideas.md
-train.ipynb
-train copy.ipynb
-u_net_model.py
-u_net_eval.ipynb
-plot_samples
-figures
-best_metrics.csv
-worst_metrics.csv
-tiny16-128_bce-dice
-res16-128_bce-dice
