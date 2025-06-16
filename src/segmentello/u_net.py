@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
 
 from data.config import LR
 from data.utils import (
@@ -37,22 +37,16 @@ class UNetMini(nn.Module):
 
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1)
 
+
     def forward(self, x):
-        skips = []
         for down in self.downs:
             x = down(x)
-            skips.append(x)
             x = self.pool(x)
 
         x = self.bottleneck(x)
-        skips = skips[::-1]
 
         for idx in range(0, len(self.ups), 2):
             x = self.ups[idx](x)
-            skip = skips[idx // 2]
-            if x.shape != skip.shape:
-                x = F.interpolate(x, size=skip.shape[2:])
-            x = torch.cat((skip, x), dim=1)
             x = self.ups[idx + 1](x)
 
         return self.final_conv(x)
