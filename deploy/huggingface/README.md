@@ -43,4 +43,4 @@ project-specific helper.
 The runtime pins Gradio 6.30.0 and Python 3.12 via the
 [Space YAML configuration](https://huggingface.co/docs/hub/spaces-config-reference).
 PyTorch and TorchVision use the official CPU wheel index, following
-[PyTorch's installation instructions](https://pytorch.org/get-started/previous-versions/#v270).
+[PyTorch's installation instructions](https://github.com/pytorch/pytorch/releases/tag/v2.14.1).
