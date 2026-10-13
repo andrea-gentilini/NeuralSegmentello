@@ -1,0 +1,1679 @@
+{
+  "schema_version": 1,
+  "dataset": "bundled",
+  "sample_count": 3,
+  "seed": 42,
+  "provenance": "Three bundled illustrative examples; original source split is unverified.",
+  "held_out_test": false,
+  "corruption": "stored paired masks",
+  "settings": {
+    "threshold": 0.5,
+    "boundary_tolerance_pixels": 2.0,
+    "max_side": null,
+    "threads": 4,
+    "device": "cpu",
+    "repeats": 3
+  },
+  "latency_definition": "Wall time per predict call, including preprocessing, device transfers, model and postprocessing; synchronized accelerator; excludes checkpoint load, metrics and file I/O; one unmeasured first-case warmup per model.",
+  "environment": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "python": "3.12.14",
+    "torch": "2.7.0",
+    "numpy": "2.2.5"
+  },
+  "models": {
+    "tiny16-32_bce-dice": {
+      "model_info": {
+        "name": "tiny16-32_bce-dice",
+        "architecture": "tiny",
+        "features": [
+          16,
+          32
+        ],
+        "checkpoint": "models/tiny16-32_bce-dice/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 117681,
+        "state_sha256": "504b4819d050d21d2e6e7353125d1b144751efcb30254f7e1a22b47ee9db5c22",
+        "checkpoint_metadata": {
+          "epoch": 5,
+          "global_step": 5400,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.9716681334074663,
+          "paired_delta_mean": -8.738823394401536e-05,
+          "paired_delta_median": 0.003709965372347912,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9449634063343771,
+          "paired_delta_mean": -0.00016502371545283148,
+          "paired_delta_median": 0.0071051305476947935,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.6888735959011045,
+          "paired_delta_mean": 0.02097623319261251,
+          "paired_delta_median": 0.0444623193499204,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 152.59895411630472,
+          "p50": 125.26283413171768,
+          "p95": 233.99270828813312,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "401b1a33f06e861c13ed6efa1babca043df0b161e58540a6f37a045ba1846a20",
+          "latency_ms": [
+            130.9088347479701,
+            125.26283413171768,
+            123.76929260790348
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9690512897213466,
+          "refined_iou": 0.9399607177930542,
+          "refined_boundary_f1": 0.7150191845197623,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "8fac2d96c9ead74fbaa3fde95602d3f6bc4bd4a7cbc84cff81b8bc9981e11813",
+          "latency_ms": [
+            122.35145922750235,
+            123.79200011491776,
+            123.65216668695211
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9799403674737351,
+          "refined_iou": 0.9606696865817825,
+          "refined_boundary_f1": 0.7576723377141469,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "69e11ebe451e7e90b58d37c52d38ef0077df77589ba97e8f642a2654ebdf1d12",
+          "latency_ms": [
+            271.0742084309459,
+            174.20933302491903,
+            178.37045807391405
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9660127430273173,
+          "refined_iou": 0.9342598146282947,
+          "refined_boundary_f1": 0.5939292654694045,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9744958285975409,
+            "paired_delta_mean": 0.004735198378087946,
+            "paired_delta_median": 0.004735198378087946,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9503152021874184,
+            "paired_delta_mean": 0.008942220941515311,
+            "paired_delta_median": 0.008942220941515311,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7363457611169546,
+            "paired_delta_mean": 0.07202221480444154,
+            "paired_delta_median": 0.07202221480444154,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 124.95609791949391,
+            "p50": 123.78064636141062,
+            "p95": 129.497334593907,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9660127430273173,
+            "paired_delta_mean": -0.009732561458007938,
+            "paired_delta_median": -0.009732561458007938,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9342598146282947,
+            "paired_delta_mean": -0.018379513029389116,
+            "paired_delta_median": -0.018379513029389116,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5939292654694045,
+            "paired_delta_mean": -0.08111573003104555,
+            "paired_delta_median": -0.08111573003104555,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 207.88466650992632,
+            "p50": 178.37045807391405,
+            "p95": 261.8038333952427,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "tiny16-128_bce-dice": {
+      "model_info": {
+        "name": "tiny16-128_bce-dice",
+        "architecture": "tiny",
+        "features": [
+          16,
+          32,
+          64,
+          128
+        ],
+        "checkpoint": "models/tiny16-128_bce-dice/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 1944049,
+        "state_sha256": "1ec8e20928d5bc100f6f75a5847ffe00933e6099b3b8329ae6506343465c55bb",
+        "checkpoint_metadata": {
+          "epoch": 3,
+          "global_step": 3600,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.9704837048389989,
+          "paired_delta_mean": -0.0012718168024114334,
+          "paired_delta_median": 0.002568791736786702,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9427236049977682,
+          "paired_delta_mean": -0.002404825052061743,
+          "paired_delta_median": 0.004914117241721527,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.6743414067625343,
+          "paired_delta_mean": 0.00644404405404216,
+          "paired_delta_median": 0.016658769133293005,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 181.5044353198674,
+          "p50": 166.37849994003773,
+          "p95": 218.8952749595046,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "557f40b913a5181e1ae0e89d8abfc650218cd77d69c622497415db1cb25ea142",
+          "latency_ms": [
+            164.9896251037717,
+            161.51266638189554,
+            159.91870872676373
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9660389542996183,
+          "refined_iou": 0.9343088487876693,
+          "refined_boundary_f1": 0.6872156343031349,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "6229c04f94c4b8a253fa39d6474ee21bef7424c7734007d1af2c0fed40474c11",
+          "latency_ms": [
+            166.37849994003773,
+            160.62450036406517,
+            169.99449953436852
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9787991938381739,
+          "refined_iou": 0.9584786732758093,
+          "refined_boundary_f1": 0.7525305058486667,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "cb52839cc3adad20c5f822667d816cfacff3f6dbbe5eefe45d98d66824101d0e",
+          "latency_ms": [
+            218.9209582284093,
+            212.34370954334736,
+            218.85675005614758
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9666129663792046,
+          "refined_iou": 0.9353832929298261,
+          "refined_boundary_f1": 0.5832780801358011,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.972419074068896,
+            "paired_delta_mean": 0.002658443849443193,
+            "paired_delta_median": 0.002658443849443193,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9463937610317392,
+            "paired_delta_mean": 0.005020779785836205,
+            "paired_delta_median": 0.005020779785836205,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7198730700759008,
+            "paired_delta_mean": 0.05554952376338773,
+            "paired_delta_median": 0.05554952376338773,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 163.90308334181705,
+            "p50": 163.25114574283361,
+            "p95": 169.09049963578582,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9666129663792046,
+            "paired_delta_mean": -0.009132338106120685,
+            "paired_delta_median": -0.009132338106120685,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9353832929298261,
+            "paired_delta_mean": -0.01725603472785764,
+            "paired_delta_median": -0.01725603472785764,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5832780801358011,
+            "paired_delta_mean": -0.09176691536464898,
+            "paired_delta_median": -0.09176691536464898,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 216.70713927596807,
+            "p50": 218.85675005614758,
+            "p95": 218.91453741118312,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "tiny16-128_bce-dice-bound": {
+      "model_info": {
+        "name": "tiny16-128_bce-dice-bound",
+        "architecture": "tiny",
+        "features": [
+          16,
+          32,
+          64,
+          128
+        ],
+        "checkpoint": "models/tiny16-128_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 1944049,
+        "state_sha256": "922722cb17bbca9a72f6f0157c965e48b5c693ca884d4942ac0ee753bd1f0a0f",
+        "checkpoint_metadata": {
+          "epoch": 24,
+          "global_step": 22500,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.977840862555101,
+          "paired_delta_mean": 0.0060853409136906915,
+          "paired_delta_median": 0.013671645431173052,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9570594065640434,
+          "paired_delta_mean": 0.01193097651421345,
+          "paired_delta_median": 0.02644143755737982,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.7242721550950781,
+          "paired_delta_mean": 0.05637479238658605,
+          "paired_delta_median": 0.14335082319016712,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 180.57994441025787,
+          "p50": 170.44449970126152,
+          "p95": 212.33532428741455,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "55af3651bf85614bb858b4b674d2b84f4e370b150e0e1bc3b40568792b5d6d56",
+          "latency_ms": [
+            170.44449970126152,
+            177.34454199671745,
+            166.39625001698732
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9869139361472721,
+          "refined_iou": 0.9741659384732585,
+          "refined_boundary_f1": 0.813907688360009,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "7253822b673476fb99a35a598c78bb497b9af9792b0f6af8c46c4844768c12ef",
+          "latency_ms": [
+            163.66779245436192,
+            160.97075026482344,
+            160.3218326345086
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9899020475325603,
+          "refined_iou": 0.9800059935914676,
+          "refined_boundary_f1": 0.817075713714223,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "0007ddc4c4aac4b8ef9c5e5e3afb0d9f0013415889e31667050181d4695a2004",
+          "latency_ms": [
+            208.7822500616312,
+            214.70404043793678,
+            202.58754212409258
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9567066039854708,
+          "refined_iou": 0.9170062876274042,
+          "refined_boundary_f1": 0.5418330632110022,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9884079918399162,
+            "paired_delta_mean": 0.018647361620463265,
+            "paired_delta_median": 0.018647361620463265,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.977085966032363,
+            "paired_delta_mean": 0.035712984786459956,
+            "paired_delta_median": 0.035712984786459956,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.8154917010371161,
+            "paired_delta_mean": 0.151168154724603,
+            "paired_delta_median": 0.151168154724603,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 166.52427784477672,
+            "p50": 165.03202123567462,
+            "p95": 175.61953142285347,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9567066039854708,
+            "paired_delta_mean": -0.019038700499854455,
+            "paired_delta_median": -0.019038700499854455,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9170062876274042,
+            "paired_delta_mean": -0.03563304003027956,
+            "paired_delta_median": -0.03563304003027956,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5418330632110022,
+            "paired_delta_mean": -0.13321193228944783,
+            "paired_delta_median": -0.13321193228944783,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 208.6912775412202,
+            "p50": 208.7822500616312,
+            "p95": 214.11186140030622,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "res16-32_bce-dice": {
+      "model_info": {
+        "name": "res16-32_bce-dice",
+        "architecture": "residual",
+        "features": [
+          16,
+          32
+        ],
+        "checkpoint": "models/res16-32_bce-dice/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 117681,
+        "state_sha256": "d966c1663d4a44f7e4a91c3c9dab66a2a4965d8e002197888b6c7b53f317e34d",
+        "checkpoint_metadata": {
+          "epoch": 5,
+          "global_step": 5400,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.970607551593201,
+          "paired_delta_mean": -0.0011479700482094346,
+          "paired_delta_median": 0.0037745927476746655,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9429775372324745,
+          "paired_delta_mean": -0.0021508928173555506,
+          "paired_delta_median": 0.007229359524392409,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.7020141504460424,
+          "paired_delta_mean": 0.0341167877375503,
+          "paired_delta_median": 0.017532916736106685,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 142.37821309102907,
+          "p50": 125.46645849943161,
+          "p95": 184.65339168906212,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "07053ea791c9aab4e7a4a1fffba8b736dcc80db01d91d9b11ed450a0b2a0004e",
+          "latency_ms": [
+            120.60270924121141,
+            123.77566657960415,
+            122.5222498178482
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9673776517901383,
+          "refined_iou": 0.9368164977904745,
+          "refined_boundary_f1": 0.6880897819059486,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "ad2b972b1809a7a3f7cb730652b378cdc0e85b4f7f338bd6911d9f6c4aa250a5",
+          "latency_ms": [
+            129.18358482420444,
+            125.46645849943161,
+            120.384874753654
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9800049948490619,
+          "refined_iou": 0.9607939155584801,
+          "refined_boundary_f1": 0.7662480722626128,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "51e8cf79e8907586d15c8deaa58f7fa8a7d112824baae26cc14f784d2618f9bb",
+          "latency_ms": [
+            190.546041354537,
+            175.81441719084978,
+            173.10791555792093
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9644400081404025,
+          "refined_iou": 0.9313221983484686,
+          "refined_boundary_f1": 0.6517045971695656,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9736913233196001,
+            "paired_delta_mean": 0.003930693100147209,
+            "paired_delta_median": 0.003930693100147209,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9488052066744773,
+            "paired_delta_mean": 0.007432225428574246,
+            "paired_delta_median": 0.007432225428574246,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7271689270842807,
+            "paired_delta_mean": 0.06284538077176766,
+            "paired_delta_median": 0.06284538077176766,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 123.65592395265897,
+            "p50": 123.14895819872618,
+            "p95": 128.25430324301124,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9644400081404025,
+            "paired_delta_mean": -0.011305296344922722,
+            "paired_delta_median": -0.011305296344922722,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9313221983484686,
+            "paired_delta_mean": -0.021317129309215144,
+            "paired_delta_median": -0.021317129309215144,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.6517045971695656,
+            "paired_delta_mean": -0.023340398330884415,
+            "paired_delta_median": -0.023340398330884415,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 179.82279136776924,
+            "p50": 175.81441719084978,
+            "p95": 189.0728789381683,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "res16-128_bce-dice": {
+      "model_info": {
+        "name": "res16-128_bce-dice",
+        "architecture": "residual",
+        "features": [
+          16,
+          32,
+          64,
+          128
+        ],
+        "checkpoint": "models/res16-128_bce-dice/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 1944049,
+        "state_sha256": "0b0505dfadbe24141a63a64f8826a546993ea7859d599d136eb5edee7340027a",
+        "checkpoint_metadata": {
+          "epoch": 3,
+          "global_step": 3600,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.969536596512303,
+          "paired_delta_mean": -0.002218925129107374,
+          "paired_delta_median": 0.0028951025803410912,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.940977235131971,
+          "paired_delta_mean": -0.004151194917859054,
+          "paired_delta_median": 0.005540122525319879,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.6477756810756031,
+          "paired_delta_mean": -0.020121681632888928,
+          "paired_delta_median": 0.02341804131080938,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 182.21981502655478,
+          "p50": 171.10545840114355,
+          "p95": 214.70619272440672,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "f18d4838f5fac024afbfe1a2999aea68541964b746dce34b1be63294c30fe95d",
+          "latency_ms": [
+            159.08162482082844,
+            163.86254224926233,
+            169.01870910078287
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9686600501991849,
+          "refined_iou": 0.9392247923550952,
+          "refined_boundary_f1": 0.6939749064806513,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "f96bf14d8232bc4521ae6080eac589c1f51b5ce14604198746e240ba0ee660e2",
+          "latency_ms": [
+            172.5707072764635,
+            169.24270801246166,
+            171.10545840114355
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9791255046817283,
+          "refined_iou": 0.9591046785594076,
+          "refined_boundary_f1": 0.7468033005403366,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "36bea23358e49641ac2cb711f92d5be489e04f577e2f1dcf9299f5b593a0e0a8",
+          "latency_ms": [
+            218.0784596130252,
+            209.64779239147902,
+            207.3703333735466
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9608242346559958,
+          "refined_iou": 0.92460223448141,
+          "refined_boundary_f1": 0.5025488362058215,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9738927774404567,
+            "paired_delta_mean": 0.00413214722100369,
+            "paired_delta_median": 0.00413214722100369,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9491647354572514,
+            "paired_delta_mean": 0.007791754211348312,
+            "paired_delta_median": 0.007791754211348312,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7203891035104939,
+            "paired_delta_mean": 0.0560655571979809,
+            "paired_delta_median": 0.0560655571979809,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 167.4802916434904,
+            "p50": 169.13070855662227,
+            "p95": 172.20439505763352,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9608242346559958,
+            "paired_delta_mean": -0.014921069829329503,
+            "paired_delta_median": -0.014921069829329503,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.92460223448141,
+            "paired_delta_mean": -0.028037093176273786,
+            "paired_delta_median": -0.028037093176273786,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5025488362058215,
+            "paired_delta_mean": -0.17249615929462858,
+            "paired_delta_median": -0.17249615929462858,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 211.6988617926836,
+            "p50": 209.64779239147902,
+            "p95": 217.23539289087057,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "res16-128_bce-dice-bound": {
+      "model_info": {
+        "name": "res16-128_bce-dice-bound",
+        "architecture": "residual",
+        "features": [
+          16,
+          32,
+          64,
+          128
+        ],
+        "checkpoint": "models/res16-128_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 1944049,
+        "state_sha256": "731e085f7f1d0ae5e82ba27c71d8f1c4dade28bfe3c5c3b93b2db68dd8b7861e",
+        "checkpoint_metadata": {
+          "epoch": 15,
+          "global_step": 14400,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.977944316058578,
+          "paired_delta_mean": 0.006188794417167724,
+          "paired_delta_median": 0.01361758753847464,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9572098311690223,
+          "paired_delta_mean": 0.012081401119192314,
+          "paired_delta_median": 0.026335478305261284,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.7255973880111964,
+          "paired_delta_mean": 0.057700025302704315,
+          "paired_delta_median": 0.1301836433971134,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 179.48101885202857,
+          "p50": 166.42787493765354,
+          "p95": 217.19623375684023,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "3c8b2f214efd667f85d37e5feff1ca09e8cb918cc4f86253093edc20e1a77e91",
+          "latency_ms": [
+            176.82012543082237,
+            166.42787493765354,
+            159.9759580567479
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9858517260894171,
+          "refined_iou": 0.9720982142857143,
+          "refined_boundary_f1": 0.8007405085669553,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "b7b5fc6558827857f9da7abd2152adfcb46257fcf7b7cb4f1674e0cac77a7741",
+          "latency_ms": [
+            160.73345858603716,
+            158.80470909178257,
+            159.04762502759695
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9898479896398619,
+          "refined_iou": 0.979900034339349,
+          "refined_boundary_f1": 0.8385060294901538,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "08a88daf68d03f0b7a9b872a329c429ba6f40171dfb9f2addb809cee42874a65",
+          "latency_ms": [
+            225.4225006327033,
+            203.2400844618678,
+            204.85683344304562
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9581332324464553,
+          "refined_iou": 0.9196312448820035,
+          "refined_boundary_f1": 0.5375456259764799,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9878498578646395,
+            "paired_delta_mean": 0.018089227645186556,
+            "paired_delta_median": 0.018089227645186556,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9759991243125317,
+            "paired_delta_mean": 0.03462614306662859,
+            "paired_delta_median": 0.03462614306662859,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.8196232690285545,
+            "paired_delta_mean": 0.15529972271604153,
+            "paired_delta_median": 0.15529972271604153,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 163.63495852177343,
+            "p50": 160.35470832139254,
+            "p95": 174.22206280753016,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9581332324464553,
+            "paired_delta_mean": -0.01761207203886994,
+            "paired_delta_median": -0.01761207203886994,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9196312448820035,
+            "paired_delta_mean": -0.033008082775680236,
+            "paired_delta_median": -0.033008082775680236,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5375456259764799,
+            "paired_delta_mean": -0.13749936952397013,
+            "paired_delta_median": -0.13749936952397013,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 211.1731395125389,
+            "p50": 204.85683344304562,
+            "p95": 223.36593391373754,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "res32-256_bce-dice-bound": {
+      "model_info": {
+        "name": "res32-256_bce-dice-bound",
+        "architecture": "residual",
+        "features": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "checkpoint": "models/res32-256_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 7765985,
+        "state_sha256": "5df9156aa6d2e59c6646c615660e270415d0b296013b1f79d9ce8ea37c36f70d",
+        "checkpoint_metadata": {
+          "epoch": 16,
+          "global_step": 15300,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.9728849019777339,
+          "paired_delta_mean": 0.0011293803363234451,
+          "paired_delta_median": 0.011407210182889704,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.947733600831588,
+          "paired_delta_mean": 0.0026051707817580003,
+          "paired_delta_median": 0.022012593283722515,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.703415743488797,
+          "paired_delta_mean": 0.03551838078030497,
+          "paired_delta_median": 0.12985697136472707,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 441.90096762031317,
+          "p50": 413.15133310854435,
+          "p95": 541.530341655016,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "2be81b9d446db9433736f2485318fca5f30bc652ae08c472c107690b3b64ff09",
+          "latency_ms": [
+            551.1422082781792,
+            413.15133310854435,
+            398.3452497050166
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9820551675420707,
+          "refined_iou": 0.9647430157593123,
+          "refined_boundary_f1": 0.800413836534569,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "c30c5b7ed628e62775aaa6bca05acc4c1994c06f067e256329c0b69991a3c3f2",
+          "latency_ms": [
+            376.3016676530242,
+            369.80075016617775,
+            365.78250024467707
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9876376122842769,
+          "refined_iou": 0.9755771493178103,
+          "refined_boundary_f1": 0.7918328123006253,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "a0e45baa8cd36b312bb7e9a2c0483123be319464193a8864cf3416e9c1264603",
+          "latency_ms": [
+            496.8941668048501,
+            527.1125417202711,
+            478.57829090207815
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9489619261068538,
+          "refined_iou": 0.9028806374176414,
+          "refined_boundary_f1": 0.5180005816311968,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9848463899131739,
+            "paired_delta_mean": 0.01508575969372089,
+            "paired_delta_median": 0.01508575969372089,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9701600825385612,
+            "paired_delta_mean": 0.028787101292658213,
+            "paired_delta_median": 0.028787101292658213,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7961233244175971,
+            "paired_delta_mean": 0.1317997781050841,
+            "paired_delta_median": 0.1317997781050841,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 412.4206181926032,
+            "p50": 387.3234586790204,
+            "p95": 516.6444894857705,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9489619261068538,
+            "paired_delta_mean": -0.026783378378471445,
+            "paired_delta_median": -0.026783378378471445,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9028806374176414,
+            "paired_delta_mean": -0.049758690240042425,
+            "paired_delta_median": -0.049758690240042425,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5180005816311968,
+            "paired_delta_mean": -0.15704441386925327,
+            "paired_delta_median": -0.15704441386925327,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 500.8616664757331,
+            "p50": 496.8941668048501,
+            "p95": 524.090704228729,
+            "observations": 3
+          }
+        }
+      }
+    },
+    "attn32-256_bce-dice-bound": {
+      "model_info": {
+        "name": "attn32-256_bce-dice-bound",
+        "architecture": "attention",
+        "features": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "checkpoint": "models/attn32-256_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+        "device": "cpu",
+        "parameter_count": 7854717,
+        "state_sha256": "bab66e1524bd3d6f919cc9ba4c487e8252e2a32cf9939e7e2e2ac3850b8880d2",
+        "checkpoint_metadata": {
+          "epoch": 21,
+          "global_step": 19800,
+          "pytorch-lightning_version": "2.5.1.post0"
+        }
+      },
+      "summary": {
+        "dice": {
+          "coarse_mean": 0.9717555216414103,
+          "refined_mean": 0.9740106692964773,
+          "paired_delta_mean": 0.002255147655066958,
+          "paired_delta_median": 0.010707188609788365,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "iou": {
+          "coarse_mean": 0.9451284300498299,
+          "refined_mean": 0.9497337549296999,
+          "paired_delta_mean": 0.004605324879869939,
+          "paired_delta_median": 0.020647478349866466,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "boundary_f1": {
+          "coarse_mean": 0.667897362708492,
+          "refined_mean": 0.7018454863794868,
+          "paired_delta_mean": 0.03394812367099472,
+          "paired_delta_median": 0.1074156808545903,
+          "improved": 2,
+          "degraded": 1,
+          "tied": 0
+        },
+        "latency_ms": {
+          "mean": 462.7287222279443,
+          "p50": 406.7551251500845,
+          "p95": 625.046200118959,
+          "observations": 9
+        }
+      },
+      "cases": [
+        {
+          "id": "plot_dset-0",
+          "source": "plot_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            427
+          ],
+          "image_sha256": "b669c31b049c3273a2f6d38dcba2fc2dcdef29a638ffa7ace9de0ae7ff402dee",
+          "coarse_sha256": "d2f638178801ae06c408c3dcdefd365038cf75f0f4fd63ea86f22b3b18f0d069",
+          "target_sha256": "67970f1d75a3cf9d0bf7e1fd64de080f822089af8d1b7667e9d94ef2ca913d19",
+          "prediction_sha256": "0937e991336bb0e3079fff1ddc2cb2f5dc58b4320b9cda8afbb1c748b373d7c3",
+          "latency_ms": [
+            419.8821661993861,
+            404.3913334608078,
+            406.7551251500845
+          ],
+          "coarse_dice": 0.9632908583375186,
+          "coarse_iou": 0.9291814064577184,
+          "coarse_boundary_f1": 0.6705568651698419,
+          "refined_dice": 0.9816214513879515,
+          "refined_iou": 0.9639062534514369,
+          "refined_boundary_f1": 0.7779725460244322,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "plot_dset-1",
+          "source": "plot_dset/coarse/input_coarse_mask_1.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            424
+          ],
+          "image_sha256": "fae346228ac96fbb1d05567e6ce2452bfda34d12a7cc915b1aeec64c97b32651",
+          "coarse_sha256": "d0d9c867c3a26db5f3c6d84733edf0526e3375c0f732843c821dc7dc510eaff9",
+          "target_sha256": "6722e7ebdd46537b4da85c57c82997d1550796b591aec1a4da96b0df8e01c8da",
+          "prediction_sha256": "ce010a17fdfc7dbdd90ad89242bf5813bed281aee7addf87cdb0ea91038a5e09",
+          "latency_ms": [
+            391.4359174668789,
+            389.19666688889265,
+            387.0540829375386
+          ],
+          "coarse_dice": 0.9762304021013872,
+          "coarse_iou": 0.9535645560340877,
+          "coarse_boundary_f1": 0.6580902274551842,
+          "refined_dice": 0.9869375907111756,
+          "refined_iou": 0.9742120343839542,
+          "refined_boundary_f1": 0.792228738951791,
+          "positive_class": "object foreground"
+        },
+        {
+          "id": "goku_dset-0",
+          "source": "goku_dset/coarse/input_coarse_mask_0.npy",
+          "image_id": null,
+          "shape": [
+            640,
+            480
+          ],
+          "image_sha256": "b5ff10141edfb2bff3bb607feebaed0d2c25695b79f3b3b25b1d7af2422c7d01",
+          "coarse_sha256": "51e0d4afcebfeb419c2e34754eac3c5752e1041f8b6ee7d1906866dbe783ccde",
+          "target_sha256": "813becc52382e482ff10859897a274afe4698fe89f39b79e2f1f56c5d90b3f44",
+          "prediction_sha256": "e30cada15d79f64002f833fc5311534b094943fae9d14f53d420f79bbf2d18ae",
+          "latency_ms": [
+            662.3001666739583,
+            569.1652502864599,
+            534.3777909874916
+          ],
+          "coarse_dice": 0.9757453044853253,
+          "coarse_iou": 0.9526393276576838,
+          "coarse_boundary_f1": 0.67504499550045,
+          "refined_dice": 0.9534729657903048,
+          "refined_iou": 0.9110829769537087,
+          "refined_boundary_f1": 0.5353351741622371,
+          "positive_class": "background (stored mask convention)"
+        }
+      ],
+      "group_summaries": {
+        "plot_dset": {
+          "dice": {
+            "coarse_mean": 0.9697606302194529,
+            "refined_mean": 0.9842795210495636,
+            "paired_delta_mean": 0.014518890830110653,
+            "paired_delta_median": 0.014518890830110653,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9413729812459031,
+            "refined_mean": 0.9690591439176955,
+            "paired_delta_mean": 0.02768616267179247,
+            "paired_delta_median": 0.02768616267179247,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.664323546312513,
+            "refined_mean": 0.7851006424881116,
+            "paired_delta_mean": 0.12077709617559856,
+            "paired_delta_median": 0.12077709617559856,
+            "improved": 2,
+            "degraded": 0,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 399.7858820172648,
+            "p50": 397.91362546384335,
+            "p95": 416.6004059370607,
+            "observations": 6
+          }
+        },
+        "goku_dset": {
+          "dice": {
+            "coarse_mean": 0.9757453044853253,
+            "refined_mean": 0.9534729657903048,
+            "paired_delta_mean": -0.022272338695020433,
+            "paired_delta_median": -0.022272338695020433,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "iou": {
+            "coarse_mean": 0.9526393276576838,
+            "refined_mean": 0.9110829769537087,
+            "paired_delta_mean": -0.04155635070397512,
+            "paired_delta_median": -0.04155635070397512,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "boundary_f1": {
+            "coarse_mean": 0.67504499550045,
+            "refined_mean": 0.5353351741622371,
+            "paired_delta_mean": -0.13970982133821297,
+            "paired_delta_median": -0.13970982133821297,
+            "improved": 0,
+            "degraded": 1,
+            "tied": 0
+          },
+          "latency_ms": {
+            "mean": 588.6144026493033,
+            "p50": 569.1652502864599,
+            "p95": 652.9866750352085,
+            "observations": 3
+          }
+        }
+      }
+    }
+  },
+  "requested_models": [
+    "tiny16-32_bce-dice",
+    "tiny16-128_bce-dice",
+    "tiny16-128_bce-dice-bound",
+    "res16-32_bce-dice",
+    "res16-128_bce-dice",
+    "res16-128_bce-dice-bound",
+    "res32-256_bce-dice-bound",
+    "attn32-256_bce-dice-bound"
+  ],
+  "status": "complete",
+  "dataset_inventory": {
+    "evaluated_cases": 3
+  },
+  "positive_class_note": "Scores follow each stored mask: plot examples mark object foreground; goku marks background. Inspect per-group scores rather than treating their mean as one foreground task.",
+  "source_revision": "f5c1bdbde6c4a3f995a4942a8f59018a63e8cff3 (original checkpoints and data); inference and evaluation as shipped with v0.2.0"
+}

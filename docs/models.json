@@ -1,0 +1,193 @@
+{
+  "description": "Bundled checkpoint inventory; tensor fingerprints exclude optimizer state. CPU smoke input is 33x47.",
+  "models": [
+    {
+      "name": "tiny16-32_bce-dice",
+      "architecture": "tiny",
+      "features": [
+        16,
+        32
+      ],
+      "checkpoint": "models/tiny16-32_bce-dice/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 117681,
+      "state_sha256": "504b4819d050d21d2e6e7353125d1b144751efcb30254f7e1a22b47ee9db5c22",
+      "checkpoint_metadata": {
+        "epoch": 5,
+        "global_step": 5400,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "tiny16-128_bce-dice",
+      "architecture": "tiny",
+      "features": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "checkpoint": "models/tiny16-128_bce-dice/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 1944049,
+      "state_sha256": "1ec8e20928d5bc100f6f75a5847ffe00933e6099b3b8329ae6506343465c55bb",
+      "checkpoint_metadata": {
+        "epoch": 3,
+        "global_step": 3600,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "tiny16-128_bce-dice-bound",
+      "architecture": "tiny",
+      "features": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "checkpoint": "models/tiny16-128_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 1944049,
+      "state_sha256": "922722cb17bbca9a72f6f0157c965e48b5c693ca884d4942ac0ee753bd1f0a0f",
+      "checkpoint_metadata": {
+        "epoch": 24,
+        "global_step": 22500,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "res16-32_bce-dice",
+      "architecture": "residual",
+      "features": [
+        16,
+        32
+      ],
+      "checkpoint": "models/res16-32_bce-dice/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 117681,
+      "state_sha256": "d966c1663d4a44f7e4a91c3c9dab66a2a4965d8e002197888b6c7b53f317e34d",
+      "checkpoint_metadata": {
+        "epoch": 5,
+        "global_step": 5400,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "res16-128_bce-dice",
+      "architecture": "residual",
+      "features": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "checkpoint": "models/res16-128_bce-dice/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 1944049,
+      "state_sha256": "0b0505dfadbe24141a63a64f8826a546993ea7859d599d136eb5edee7340027a",
+      "checkpoint_metadata": {
+        "epoch": 3,
+        "global_step": 3600,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "res16-128_bce-dice-bound",
+      "architecture": "residual",
+      "features": [
+        16,
+        32,
+        64,
+        128
+      ],
+      "checkpoint": "models/res16-128_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 1944049,
+      "state_sha256": "731e085f7f1d0ae5e82ba27c71d8f1c4dade28bfe3c5c3b93b2db68dd8b7861e",
+      "checkpoint_metadata": {
+        "epoch": 15,
+        "global_step": 14400,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "res32-256_bce-dice-bound",
+      "architecture": "residual",
+      "features": [
+        32,
+        64,
+        128,
+        256
+      ],
+      "checkpoint": "models/res32-256_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 7765985,
+      "state_sha256": "5df9156aa6d2e59c6646c615660e270415d0b296013b1f79d9ce8ea37c36f70d",
+      "checkpoint_metadata": {
+        "epoch": 16,
+        "global_step": 15300,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    },
+    {
+      "name": "attn32-256_bce-dice-bound",
+      "architecture": "attention",
+      "features": [
+        32,
+        64,
+        128,
+        256
+      ],
+      "checkpoint": "models/attn32-256_bce-dice-bound/checkpoints/best-checkpoint.ckpt",
+      "device": "cpu",
+      "parameter_count": 7854717,
+      "state_sha256": "bab66e1524bd3d6f919cc9ba4c487e8252e2a32cf9939e7e2e2ac3850b8880d2",
+      "checkpoint_metadata": {
+        "epoch": 21,
+        "global_step": 19800,
+        "pytorch-lightning_version": "2.5.1.post0"
+      },
+      "smoke_output_shape": [
+        33,
+        47
+      ],
+      "finite": true
+    }
+  ]
+}

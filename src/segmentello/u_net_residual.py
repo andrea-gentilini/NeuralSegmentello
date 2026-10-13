@@ -1,10 +1,10 @@
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
-from data.config import LR
-from data.utils import (
+from .data.config import LR
+from .data.utils import (
     DiceLoss,
     DoubleConv,
     SobelLoss,
@@ -16,7 +16,7 @@ from data.utils import (
 
 
 class UNetMini(nn.Module):
-    def __init__(self, in_channels=3, out_channels=1, features=[16, 32]):
+    def __init__(self, in_channels=3, out_channels=1, features=(16, 32)):
         super().__init__()
         self.downs = nn.ModuleList()
         self.ups = nn.ModuleList()
@@ -62,8 +62,8 @@ class Coarse2FineTinyRes(pl.LightningModule):
     def __init__(
         self,
         lr: float = LR,
-        features: list[int] = [16, 32],
-        losses: list[str] = ["bce", "dice"],
+        features: tuple[int, ...] = (16, 32),
+        losses: tuple[str, ...] = ("bce", "dice"),
         loss_weights: list[int | float] | None = None,
     ):
         """
@@ -88,9 +88,7 @@ class Coarse2FineTinyRes(pl.LightningModule):
         return refined
 
     def compute_loss(self, preds, y):
-        return sum(
-            [w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)]
-        )
+        return sum([w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)])
 
     def training_step(self, batch, batch_idx):
         x, y = batch
@@ -110,7 +108,7 @@ class Coarse2FineTinyRes(pl.LightningModule):
         loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
-        preds_class = (preds > 0.5).float()
+        preds_class = (torch.sigmoid(preds) >= 0.5).float()
         ious = []
         accuracies = []
         boundary_ious = []

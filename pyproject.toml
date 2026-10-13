@@ -1,25 +1,54 @@
+[build-system]
+requires = ["setuptools>=77,<83"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "neuralsegmentello"
-version = "0.1.0"
-description = ""
+version = "0.2.0"
+description = "Coarse-to-fine segmentation with compact U-Nets, local inference, and reproducible evaluation."
+readme = "README.md"
+license = "MIT"
 authors = [
     {name = "Andrea Gentilini", email = "agentilini99@gmail.com"},
     {name = "Iacopo Scandale", email = "iacopo.scandale.is@gmail.com"},
     {name = "Leo Petrarca", email = "leopetrarca6@gmail.com"},
     {name = "Michele Magrini", email = "magrini.2066963@studenti.uniroma.it"},
 ]
-requires-python = ">=3.12"
-
+requires-python = ">=3.12,<3.14"
 dependencies = [
-    "matplotlib==3.10.3",
     "numpy==2.2.5",
-    "opencv-python==4.11.0.86",
-    "pycocotools==2.0.8",
-    "pytorch-lightning==2.5.1.post0",
+    "opencv-python-headless==4.11.0.86",
+    "pillow>=11.1,<13",
     "torch==2.7.0",
-    "torchmetrics==1.7.1",
     "torchvision==0.22.0",
+    "pytorch-lightning==2.5.1.post0",
+    "torchmetrics==1.7.1",
     "scipy==1.15.1",
+    "pycocotools==2.0.8",
+    "matplotlib==3.10.3",
     "pandas==2.2.3",
-    "ipykernel>=6.29.5",
 ]
+
+[project.optional-dependencies]
+demo = ["gradio==6.30.0"]
+dev = ["pytest>=8,<10", "ruff==0.17.0", "build>=1.2,<2"]
+notebooks = ["ipykernel>=6.29.5,<8"]
+
+[project.scripts]
+segmentello = "segmentello.cli:main"
+segmentello-demo = "segmentello.demo:main"
+
+[project.urls]
+Repository = "https://github.com/andrea-gentilini/NeuralSegmentello"
+Issues = "https://github.com/andrea-gentilini/NeuralSegmentello/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+exclude = ["*.ipynb"]

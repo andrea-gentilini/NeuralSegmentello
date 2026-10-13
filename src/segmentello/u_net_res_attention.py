@@ -1,10 +1,10 @@
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
-from data.config import LR
-from data.utils import (
+from .data.config import LR
+from .data.utils import (
     AttentionBlock,
     DiceLoss,
     DoubleConv,
@@ -17,7 +17,7 @@ from data.utils import (
 
 
 class UNet(nn.Module):
-    def __init__(self, in_channels=1, out_channels=1, features=[32, 64, 128, 256]):
+    def __init__(self, in_channels=1, out_channels=1, features=(32, 64, 128, 256)):
         super().__init__()
         self.downs = nn.ModuleList()
         self.ups = nn.ModuleList()
@@ -54,9 +54,7 @@ class UNet(nn.Module):
 
         for i in range(0, len(self.ups), 2):
             x = self.ups[i](x)  # Upsample first
-            attn = self.attentions[i // 2](
-                g=x, x=skip[i // 2]
-            )  # Apply attention AFTER upsample
+            attn = self.attentions[i // 2](g=x, x=skip[i // 2])  # Apply attention AFTER upsample
             if x.shape != attn.shape:
                 x = F.interpolate(x, size=attn.shape[2:])
             x = torch.cat([attn, x], dim=1)
@@ -72,8 +70,8 @@ class Coarse2FineUNetAttention(pl.LightningModule):
         out_channels=1,
         lr=LR,
         loss_weights=None,
-        losses=["bce", "dice"],
-        features=[32, 64, 128, 256]
+        losses=("bce", "dice"),
+        features=(32, 64, 128, 256),
     ):
         """
         losses: {"bce","dice","boundary"}
@@ -93,9 +91,7 @@ class Coarse2FineUNetAttention(pl.LightningModule):
         return self.model(x)
 
     def compute_loss(self, preds, y):
-        return sum(
-            [w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)]
-        )
+        return sum([w * loss(preds, y) for w, loss in zip(self.default_weights, self.losses)])
 
     def training_step(self, batch, batch_idx):
         x, y = batch  # x: [B, 3, H, W], y: [B, 1, H, W]
@@ -114,7 +110,7 @@ class Coarse2FineUNetAttention(pl.LightningModule):
         loss = self.compute_loss(preds, y)
         self.log("val_loss", loss, prog_bar=True)
 
-        preds_class = (preds > 0.5).float()
+        preds_class = (torch.sigmoid(preds) >= 0.5).float()
         ious = []
         accuracies = []
         boundary_ious = []

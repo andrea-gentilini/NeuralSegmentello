@@ -1,8 +1,22 @@
-COCO_dataset_2014
+# Environments, caches, and local outputs
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.cache/
+.tmp/
 .DS_Store
-__pycache__
-*venv
-lightning_logs
-.vscode
-reduced_dset_*
+.vscode/
 .rsyncignore
+build/
+dist/
+outputs/
+artifacts/
+lightning_logs/
+
+# Full datasets and locally prepared subsets
+COCO_dataset_2014/
+reduced_dset_*/

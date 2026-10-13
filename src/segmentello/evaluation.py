@@ -1,25 +1,22 @@
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
-from pathlib import Path
-
-from data.config import DIR_REDUCED_DSET
-from dataset import CoarseMaskDataset
-from u_net import Coarse2FineTiny
-from u_net_res_attention import Coarse2FineUNetAttention
-from u_net_residual import Coarse2FineTinyRes
 
 
 def plot_result(dataset, model, num_samples=5, threshold=0.5):
     n_rows = min(num_samples, len(dataset))
     n_cols = 4  # input image, input mask, target mask, predicted mask
 
+    if n_rows == 0:
+        raise ValueError("Dataset contains no samples")
+    model.eval()
+    device = next(model.parameters()).device
     plt.figure(figsize=(n_cols * 4, n_rows * 4))
 
     for i in range(n_rows):
-        item, target = dataset[i + 89]  # FIXME
+        item, target = dataset[i]
         # item = sample[0]
         # target = sample[1]
         # print(f"{item.shape = }")
@@ -27,13 +24,13 @@ def plot_result(dataset, model, num_samples=5, threshold=0.5):
         # input()
 
         with torch.no_grad():
-            predicted = model(item.unsqueeze(0))
+            predicted = model(item.unsqueeze(0).to(device))
             predicted_probs = torch.sigmoid(predicted)
             predicted_mask = (predicted_probs > threshold).float()
 
         images = [
-            item[0].cpu(),  # input image
-            item[1].cpu(),  # input coarse mask
+            item[1].cpu(),  # input image
+            item[0].cpu(),  # input coarse mask
             target[0].cpu(),  # ground truth mask
             predicted_mask[0][0].cpu(),  # predicted mask
         ]
@@ -47,7 +44,7 @@ def plot_result(dataset, model, num_samples=5, threshold=0.5):
         for j in range(n_cols):
             ax = plt.subplot(n_rows, n_cols, i * n_cols + j + 1)
             ax.imshow(images[j], cmap="gray")
-            # ax.set_title(titles[j])
+            ax.set_title(titles[j])
             ax.axis("off")
     plt.tight_layout()
     plt.show()

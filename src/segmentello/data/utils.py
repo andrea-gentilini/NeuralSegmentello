@@ -1,8 +1,8 @@
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from scipy.spatial.distance import directed_hausdorff
+from torch import nn
 
 
 # Modules
@@ -96,9 +96,7 @@ class AttentionBlock(nn.Module):
 
         # Align shapes explicitly
         if g1.shape[2:] != x1.shape[2:]:
-            g1 = F.interpolate(
-                g1, size=x1.shape[2:], mode="bilinear", align_corners=False
-            )
+            g1 = F.interpolate(g1, size=x1.shape[2:], mode="bilinear", align_corners=False)
 
         psi = self.relu(g1 + x1)
         psi = self.psi(psi)
@@ -114,16 +112,14 @@ def compute_iou(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tenso
     iou = (
         intersection / union
         if union > 0
-        else torch.tensor(1.0)
+        else pred_mask.new_tensor(1.0)
         if intersection == 0
-        else torch.tensor(0.0)
+        else pred_mask.new_tensor(0.0)
     )
     return iou
 
 
-def compute_pixel_accuracy(
-    pred_mask: torch.Tensor, true_mask: torch.Tensor
-) -> torch.Tensor:
+def compute_pixel_accuracy(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
     correct = (pred_mask == true_mask).float().sum()
@@ -152,9 +148,9 @@ def compute_boundary_iou(
     iou = (
         intersection / union
         if union > 0
-        else torch.tensor(1.0)
+        else pred_mask.new_tensor(1.0)
         if intersection == 0
-        else torch.tensor(0.0)
+        else pred_mask.new_tensor(0.0)
     )
     return iou
 
@@ -163,9 +159,7 @@ def mask_to_numpy_coords(mask: torch.Tensor) -> np.ndarray:
     return mask.nonzero(as_tuple=False).cpu().numpy()
 
 
-def compute_hausdorff_distance(
-    pred_mask: torch.Tensor, true_mask: torch.Tensor
-) -> torch.Tensor:
+def compute_hausdorff_distance(pred_mask: torch.Tensor, true_mask: torch.Tensor) -> torch.Tensor:
     pred_mask = (pred_mask > 0).float()
     true_mask = (true_mask > 0).float()
 
@@ -173,10 +167,10 @@ def compute_hausdorff_distance(
     true_coords = mask_to_numpy_coords(true_mask)
 
     if pred_coords.size == 0 and true_coords.size == 0:
-        return torch.tensor(0.0)  # no structure in either
+        return pred_mask.new_tensor(0.0)  # no structure in either
     if pred_coords.size == 0 or true_coords.size == 0:
-        return torch.tensor(float("inf"))  # one is empty
+        return pred_mask.new_tensor(float("inf"))  # one is empty
 
     hd_forward = directed_hausdorff(pred_coords, true_coords)[0]
     hd_backward = directed_hausdorff(true_coords, pred_coords)[0]
-    return torch.tensor(max(hd_forward, hd_backward))
+    return pred_mask.new_tensor(max(hd_forward, hd_backward))

@@ -1,0 +1,38 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      MPLBACKEND: Agg
+      GRADIO_ANALYTICS_ENABLED: "False"
+      DO_NOT_TRACK: "1"
+      OMP_NUM_THREADS: "2"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[dev,demo]"
+      - name: Lint
+        run: ruff check src tests examples deploy
+      - name: Test
+        run: pytest -q
+      - name: Build distributable package
+        run: python -m build
+      - name: Verify command line
+        run: segmentello info --model res16-32_bce-dice --device cpu
