@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "scope": "Binary prediction masks at probability threshold 0.5, CPU, native resolution; probability maps and accelerator execution were not compared.",
+  "previous_torch": "2.7.0",
+  "current_torch": "2.14.1",
+  "code_revision": "f95fd43331cae1125f4388617c952a06eea8d162",
+  "datasets": {
+    "coco50": {
+      "sample_count": 49,
+      "model_count": 8,
+      "models": {
+        "res16-32_bce-dice": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-32_bce-dice": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-128_bce-dice": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-128_bce-dice-bound": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res16-128_bce-dice": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res16-128_bce-dice-bound": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res32-256_bce-dice-bound": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "attn32-256_bce-dice-bound": {
+          "compared_binary_masks": 49,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        }
+      },
+      "compared_binary_masks": 392,
+      "changed_binary_masks": 0
+    },
+    "bundled": {
+      "sample_count": 3,
+      "model_count": 8,
+      "models": {
+        "res16-32_bce-dice": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-32_bce-dice": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-128_bce-dice": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "tiny16-128_bce-dice-bound": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res16-128_bce-dice": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res16-128_bce-dice-bound": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "res32-256_bce-dice-bound": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        },
+        "attn32-256_bce-dice-bound": {
+          "compared_binary_masks": 3,
+          "changed_binary_masks": 0,
+          "changed_case_ids": [],
+          "same_inputs_and_targets": true,
+          "same_checkpoint_tensors": true
+        }
+      },
+      "compared_binary_masks": 24,
+      "changed_binary_masks": 0
+    }
+  },
+  "compared_binary_masks": 416,
+  "changed_binary_masks": 0
+}

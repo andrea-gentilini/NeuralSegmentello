@@ -9,7 +9,7 @@ These measurements check the supplied checkpoints and evaluation pipeline. **The
 - Inference: original resolution, no resizing, padding to the model stride, probability threshold 0.5. Three repeats per case, one first-case warm-up per model.
 - Metrics: macro means over source images. Dice and IoU use binary foreground. Boundary F1 uses one-pixel inner contours and symmetric nearest-boundary matching within **2 pixels**; it is not boundary IoU. Both-empty masks score 1; one-empty scores 0. No background-dominated pixel accuracy is used as the headline metric.
 - Timing: CPU wall time for `predict`, including preprocessing, device transfers, network, and postprocessing. Excludes checkpoint loading, metrics, and file I/O. Accelerator calls are synchronized when used. Reported p50 pools all 147 timed calls per model. Shape-dependent timings and local hardware limit portability.
-- Environment: macOS 26.5.1, ARM64, Python 3.12.14, PyTorch 2.7.0, NumPy 2.2.5, four PyTorch threads. Models ran sequentially. These are local measurements, not a hardware-independent speed claim.
+- Environment: macOS 26.5.1, ARM64, Python 3.12.14, PyTorch 2.14.1, torchvision 0.29.1, PyTorch Lightning 2.6.6, TorchMetrics 1.9.0, NumPy 2.2.5, four PyTorch threads. Models ran sequentially. These are local measurements, not a hardware-independent speed claim.
 
 ## Paired COCO subset results
 
@@ -17,14 +17,14 @@ The coarse baseline has mean Dice **0.8546**, IoU **0.8004**, and boundary F1 **
 
 | Model | Dice ↑ | IoU ↑ | Boundary F1 ↑ | Dice improved / worse / tied | CPU p50 (ms) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `res16-32_bce-dice` | 0.8720 | 0.8221 | 0.5834 | 33 / 13 / 3 | 161.3 |
-| `tiny16-32_bce-dice` | 0.8752 | 0.8254 | 0.5861 | 34 / 14 / 1 | 165.4 |
-| `tiny16-128_bce-dice` | 0.8692 | 0.8186 | 0.5863 | 31 / 15 / 3 | 208.2 |
-| `tiny16-128_bce-dice-bound` | 0.8905 | 0.8496 | 0.6834 | 45 / 3 / 1 | 208.6 |
-| `res16-128_bce-dice` | 0.8711 | 0.8199 | 0.5735 | 30 / 17 / 2 | 208.3 |
-| `res16-128_bce-dice-bound` | 0.8912 | 0.8475 | 0.6646 | 42 / 6 / 1 | 207.0 |
-| `res32-256_bce-dice-bound` | 0.8913 | 0.8458 | 0.6564 | 46 / 3 / 0 | 485.3 |
-| `attn32-256_bce-dice-bound` | 0.8972 | 0.8543 | 0.6740 | 47 / 2 / 0 | 520.9 |
+| `res16-32_bce-dice` | 0.8720 | 0.8221 | 0.5834 | 33 / 13 / 3 | 162.8 |
+| `tiny16-32_bce-dice` | 0.8752 | 0.8254 | 0.5861 | 34 / 14 / 1 | 156.7 |
+| `tiny16-128_bce-dice` | 0.8692 | 0.8186 | 0.5863 | 31 / 15 / 3 | 196.4 |
+| `tiny16-128_bce-dice-bound` | 0.8905 | 0.8496 | 0.6834 | 45 / 3 / 1 | 191.0 |
+| `res16-128_bce-dice` | 0.8711 | 0.8199 | 0.5735 | 30 / 17 / 2 | 196.8 |
+| `res16-128_bce-dice-bound` | 0.8912 | 0.8475 | 0.6646 | 42 / 6 / 1 | 189.0 |
+| `res32-256_bce-dice-bound` | 0.8913 | 0.8458 | 0.6564 | 46 / 3 / 0 | 453.6 |
+| `attn32-256_bce-dice-bound` | 0.8972 | 0.8543 | 0.6740 | 47 / 2 / 0 | 479.1 |
 
 The default `res16-128_bce-dice-bound` is a practical compromise between the boundary-loss models and the smaller models. This choice uses the included development examples; it is not an independently validated model-selection result. In this run, the attention model has the highest mean Dice, while the smaller boundary-loss Tiny model has the highest boundary F1. Some models improve overlap while slightly worsening boundaries, so these metrics should be read together.
 
@@ -60,6 +60,12 @@ python -m segmentello.benchmark \
 ```
 
 Replace `--dataset coco` with `--dataset bundled` to run the three stored cases. Timings will vary. JSON stores hashes of inputs, targets, predictions, and checkpoint tensors so comparisons can check that they used the same data. Masks themselves are saved only with `--save-predictions`.
+
+## Runtime recheck
+
+The results above were regenerated after updating the runtime from PyTorch 2.7.0 to 2.14.1. All **416 binary prediction masks** have identical hashes across the two runs: 392 COCO predictions and 24 bundled-example predictions. The input, target, and checkpoint tensor hashes also match. The two README examples from the default model are unchanged.
+
+This check compares thresholded masks on CPU, not full probability maps or accelerator results. Latency was measured again; differences between local runs do not establish a runtime speedup. See the [per-model comparison](benchmarks/runtime-comparison.json).
 
 ## Relationship to the 2025 report
 
