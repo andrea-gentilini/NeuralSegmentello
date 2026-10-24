@@ -65,6 +65,8 @@ Replace `--dataset coco` with `--dataset bundled` to run the three stored cases.
 
 The results above were regenerated after updating the runtime from PyTorch 2.7.0 to 2.14.1. All **416 binary prediction masks** have identical hashes across the two runs: 392 COCO predictions and 24 bundled-example predictions. The input, target, and checkpoint tensor hashes also match. The two README examples from the default model are unchanged.
 
+The same check was repeated after the security update from Pillow 12.3.0 to 13.0.0: all 416 prediction hashes, as well as the input, target, and checkpoint tensor hashes, are unchanged.
+
 This check compares thresholded masks on CPU, not full probability maps or accelerator results. Latency was measured again; differences between local runs do not establish a runtime speedup. See the [per-model comparison](benchmarks/runtime-comparison.json).
 
 ## Relationship to the 2025 report

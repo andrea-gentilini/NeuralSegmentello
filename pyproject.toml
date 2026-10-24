@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=83,<85"]
+requires = ["setuptools>=84.1,<85"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -18,7 +18,7 @@ requires-python = ">=3.12,<3.14"
 dependencies = [
     "numpy==2.2.5",
     "opencv-python-headless==4.11.0.86",
-    "pillow>=12.3,<13",
+    "pillow>=12.3,<14",
     "torch==2.14.1",
     "torchvision==0.29.1",
     "pytorch-lightning==2.6.6",
@@ -52,3 +52,10 @@ addopts = "-ra"
 [tool.ruff]
 line-length = 100
 exclude = ["*.ipynb"]
+
+[tool.uv]
+# gradio 6.x caps pillow<13, but every Pillow release before 13.0.0 is affected by
+# critical advisories (e.g. GHSA-8g5g-8vmr-9782). The override keeps uv.lock on the
+# patched release; plain pip installs of the demo extra stay limited by gradio until
+# gradio 7 lifts the cap (gradio-app/gradio#14005). Drop the override after that.
+override-dependencies = ["pillow>=13,<14"]
